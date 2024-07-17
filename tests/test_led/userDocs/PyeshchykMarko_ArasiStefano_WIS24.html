@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+</style>
+    
+ 
+   
+</head>
+	
+		
+  
+
+
+   
+<title>WIS</title></head>
+    
+<!--
+	<body onload="loadNav();">
+		<div id="openButton" class="openButton" onclick="openNav(true)">&#9776; Menu</div>
+		<div id="sidenav" class="sidenav">
+			<a class="closeButton" href="javascript:void(0)" onclick="closeNav(true)">&times;</a>
+			<a href=".README.html">ReadMe</a>
+			<a class="sprint" href="../../../Sprint0/Codice/userDocs/Cold%20Storage%20Service%20-%20Natali%20V3.html">Sprint0</a>
+			<a class="sprint" href="../../../Sprint1.0/Codice/userDocs/Sprint%201.0%20-%20V3.html">Sprint1.0</a>
+			<a class="sprint" href="../../../Sprint1.1/Codice/userDocs/Sprint%201.1%20-%20V3.html">Sprint1.1</a>
+			<a id="currentSprint" class="sprint" href="#">&#8211;&#8212; Sprint2 &#8212;&#8211;</a>
+			<div class="sidenavSection">
+				<a href="#Goal Sprint 2">Goal Sprint 2</a>
+				<a href="#Requisiti">Requisiti</a>
+				<a href="#Analisi dei Requisiti">Analisi dei Requisiti</a>
+				<a href="#Analisi del Problema">Analisi del Problema</a>
+				<a href="#Test Plan">Test Plan</a>
+				<a href="#Progettazione">Progettazione</a>
+				<a href="#Deployment">Deployment</a>
+			</div>
+			<p class="separator">&mdash;&mdash;&mdash;&ndash;&ndash;&mdash;&mdash;&mdash;</p>
+			<a class="sprint" href="../../../Sprint3/Codice/userDoc/Sprint%203.html">Sprint3</a>
+			<bottom-spacer/>
+		</div>
+-->
+<body>
+<div id="top">
+<h1>WIS<font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h2>Introduction</h2>
+<div class="remark">
+	SPRINT6: progettazione e sviluppo dei WIS (Arasi e P'yeshchyk).
+</div>
+ 
+<h2>Requirements</h2>
+<div class="remark">
+	<a href="./html/TemaFinale24.html">Requisiti</a> 
+</div>
+
+ 
+
+<h2>Requirement analysis</h2>
+<div class="remark">
+    <h3>Service Area</h3>
+    Spazio rettangolare che puo essere descritto come <a href="./html/RobotCleaner.html?highlight=requisiti#rc24-analisi-dei-requisiti">spazio euclideo delimitato da bordi</a>. <br>
+    La mappa quindi puo essere descritta come matrice bidimensionale map[C,R] a "misura del robot": partendo da DR, la matrice ha R rige C e colonne. <br> 
+    <br>
+    Su questo piano sono posizionate tutte le entità, in particolare tutte le porte rappresentano coordinate dove il robot si deve dirigere per svolgere le proprie mansioni:
+    <li>HOME: punto di partenza del robot puo essere definita da map[0,0]</li>
+    <li>WASTEIN port: punto di accesso del WasteStorage puo essere definita da map[C,0]</li>
+    <li>ASHOUT port: punto di accesso del AshStorage puo essere definita da map[C,R]</li>
+ 
+	<br>
+	<h3>WIS  (Attore)</h3>
+    Entità attiva che funge quindi da coordinatore del sistema visto per comandare il OpRobot: <code>Dispatch robot_move:robot_move(X)</code>. Per fare ciò deve conoscere anche le informazioni degli altri attori.
+    <br>
+    Gli è necessario sapere il peso degli RP per capire quando rendere operativo il OpRobot: <code>Dispatch weight:weight(X)</code>.
+	<br><br>
+	Per tale scopo WasteStorage deve utilizzare la bilancia e non è stato definito un metodo di comunicazione.
+	<br>
+	<br>WasteStorage  (Attore): container di RP, deve essere in grado di inviare informazioni riguardanti il suo stato.
+	Per il sistema la parte fondamentale è la bilancia (fornita dal committente), ovvero una fonte di informazioni autonoma con cui WasteStorage deve interfacciarsi per rilevare il numero di RP presenti.
+	Non è stato definito un metodo di comunicazione con Scale. <br>
+	Il numero di RP deve essere acessibile alla GUI. 
+
+
+	<br><br><h3>MonitoringDevice (Attore)</h3> 
+    Composto da un RaspberryPi che gestisce un Sonar e un Led (forniti dal committente). Deve inviare al sistema lo stato di AshStorage: <code>Dispatch sonar_value:sonar_value(K)</code>.<br><br>
+    Sonar e Led in quanto collegati ad un RaspberryPI sono possibili da considerare in un contesto diverso dal resto del sistema.<br>
+    MonitoringDevice in quanto coordinatore farà anch'esso parte di questo contesto.
+	<br><br> Sonar (Attore) si occupa della misurazione della distanza tra se stesso e la pila di cenere nell'AshStorage.
+	Per questo scopo si interfaccia con un sonar fisico (SONAR HC-SR04) che gli manda le distanze rilevate. <br>
+	L'informazione di 3-4 RP che AshStorage può contenere è superflua perche è stato già dato il limite DLIMIT al sonar. <br>
+	Sonar, inoltre, deve essere in grado di inviare informazioni riguardanti il suo stato alla GUI e al sistema. Non è stato definito un metodo di comunicazione.
+	<br><br>Il Led (Attore) deve accendersi/spegnersi o lampeggiare in base allo stato del sistema. Anche qusto si interfaccia con il led fisico.
+
+
+	<br><br><h3>Incinerator  (Attore)</h3>
+	Luogo fisico definito nella Service Area di coordinate map[X,Y]:
+    <li>porta BURNIN di coordinate map[X-1,Y]</li>
+    <li>porta BORNOUT di coordinate map[X,Y+1]</li>
+	In questo caso le coordinate di Incinerator sono [4,2].
+	<br><br>
+	Un <code>Dispatch activation_command:activation_command</code> viene mandato da parte di un agente esterno al sistema per far partire l'Incinerator.
+	Dopo l'inizio dell'incenerimento passano BTIME secondi e <code>Event burn_end:burn_end(N)</code> viene comunicato dal Incinerator (fine dell'incenerimento). <br>
+    L'Incinerator non deve bruciare RP se non è stato attivato. <br><br>
+	
+ 	Per caricare un nuovo RP la cenere deve essere svuotata. Non è definito il modo con cui l'inceneritore riceva l'informazione che la cenere è stata svuotata.
+	
+	<br><br><h3>OpRobot (Attore)</h3>
+	 Sappiamo che il OpRobot è un <a href="https://www.youtube.com/watch?v=aE7RQNhwnPQ">DDR robot</a> fornito dal committente.
+	 Quindi si puo sfruttare il <a href="./html//BasicRobot24.html">BasicRobot24</a> per interfacciarsi, 
+	 rendendolo uno degli attori principali del sistema.
+ 
+	 <br><br>
+	 Deve ricevere informazioni riguardanti WasteStorage, AshStorage e Incinerator per capire quando essere operativo.
+	 Al momento non è possibile definire la tipologia dei messaggi.
+ 
+	 <br><br>
+	 Ha la responsabilità di portare un RP per volta alla porta BURNIN.
+	 Il robot deve aspettare in HOME e dare priorità a svuotare la cenere dal Incinerator rispetto a gestire un nuovo RP.
+	 Deve recarsi quindi alla porta BURNOUT dopo aver ricevuto l'evento dall'inceneritore (burn_end).
+
+	 <br><br><h3>Agenti esterni</h3>
+	 Lo sviluppo degli agenti esterni per rifornire e svuotare la WasteStorage e AshStorage non sono dei requisiti:
+	 <li>quando WasteStorage viene rifornito Scale rileverà un peso maggiore</li>
+	 <li>quanto AshStorage viene svuotato Sonar rileverà una distanza maggiore</li>
+	 In entrambi i casi il sistema funziona autonomamente e reagisce alle modifiche.
+
+	 <br><br><h3>Modello dei requisiti</h3>
+	 Il sistema puo essere quindi descritto da un insieme di attori che comunicano tra loro per raggiungere uno scopo comune. Perciò il <a href="./html/QakActors24.html?#linguaggio-qak">linguaggio QAK</a> è un possibile strumento per la modellazione e sviluppo dell'allpicazione.
+	 <br> 
+	 <img src="../wis24arch_modello_requisiti.png">
+
+	 <br><br><h3>Priorità dei requisiti</h3>
+     <ol>
+        <li>Incinerator: in quanto elemento core del sistema attorno a cui tutti gli altri elementi dipendono</li>
+        <li>WasteStorage: in quanto elemento essenziale per il funzionamento di Incinerator e con poche responsabilità</li>
+        <li>MonitoringDevice: in quanto elemento essenziale per il funzionamento di Incinerator ma con più responsabilità rispetto a WasteStorage</li>
+        <li>OpRobot: in quanto elemento essenziale per il funzionamento di Incinerator ed elemento che interagisce con tutti gli elementi elencati prima</li>
+        <li>WIS: in quanto elemento coordinatore del sistema e ha bisogno delle entità sopracitate per il corretto funzionamento</li>
+        <li>GUI: in quanto elemento non essenziale al corretto funzionamento del sistema e di pura presentazione di dati, ha bisogno di conoscere informazioni dalle varie entità del sistema</li>
+     </ol>
+
+</div>
+
+<h2>Problem analysis</h2>
+<div class="remark">
+    GOAL: WIS.
+
+	<br><br>
+            <h3>WIS(Attore e coordinatore)</h3>
+            WIS è il coordinatore del sistema che deve comunicare con tutti e aggiornare il proprio stato in relazione alle variazioni.
+            <br>
+            Come già definito in precedenza deve scambiare messaggi con: <br>
+            
+            MonitoringDevice
+            <li><code>Dispatch burn_start:burn_start(N)</code></li>
+            <li><code>Dispatch burn_end:burn_end(X)</code></li>
+            <li><code>Dispatch sonar_value:sonar_value(K)</code></li>
+
+            OpRobot
+            <li><code>Dispatch take_RP : take_RP(X)</code></li>
+            <li><code>Dispatch take_ash : take_RP(X)</code></li>
+            <li><code>Dispatch go_home : take_RP(X)</code></li>
+            <li><code>Dispatch work : work(X)</code></li>
+            
+            WasteStorage
+            <li><code>Dispatch weight:weight(N)</code></li>
+
+            Incinerator
+            <li><code>Event burn_end : burn_end(N)</code></li>
+            
+            <br>
+            Inoltre, WIS non deve inviare comandi al robot finchè <code>Dispatch activation_command:activation_command(X)</code> non è stato ricevuto da Incinerator.<br>
+            Perciò quest'ultimo dovrà innoltrare questo messaggio a WIS.<br>
+            Mentre Incinerator non è attivo, WIS deve comunque poter comunicare con WasteStorage e MonitoringDevice.
+            <br><br>
+
+            Infine, lo stato del sistema deve essere sempre acciessibile alla GUI ma questo verrà affrontato nel prossimo SPRINT.<br><br>
+            <h3>Architettura logica</h3>
+            <img src="../wis24arch.png">
+        </div>
+
+        <h2>Test plans</h2>
+        <div class="remark">
+            <li>Setuppare il WS con 50 Kg (1 RP) e erificare che il robot vada prima da WS poi BURNIN poi HOME poi BURNOUT poi ASHOUT poi HOME.</li>
+            <li>Setuppare il WS con 100 Kg (1 RP) e erificare che il robot vada prima da WS poi BURNIN poi HOME poi BURNOUT poi ASHOUT poi riparta da WS.</li>
+            <li>Setuppare il AshStorage in modo che la distanza rilevata sia minore del limite e verificare che il robot vada prima da WS poi BURNIN poi HOME e si ferma.</li>
+        </div>
+
+        <h2>Project</h2>
+        <div class="remark">
+		<a href="../src/TemaFinale24.qak">Progetto</a><br><br>
+            WIS utilizza variabili per tenere conto dello stato di tutto il sistema:
+            <code>var distance</code>
+            <code>var weight</code>
+            <code>var robot</code>
+            <code>var incinerator</code>. <br>
+            Le informazioni sullo stato gli vengono comunicate dagli altri attori.
+            Inizialmente WIS è nello stato ready e una volta ricevuto <code>activation_command</code> da Incinerator passa allo stato "activated". 
+            Solo in "activated" puo iniziare a cmandare il robot altrimenti si limita a ricevere informazioni.
+            <br>
+            
+            
+        </div>
+
+        <h2>Testing</h2>
+        <div class="remark">
+
+        </div>
+
+        <h2>Deployment</h2>
+
+
+        <h2>Maintenance</h2>
+
+        <!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+
+        <br /><br />
+    </div>
+
+    <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+        By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it,
+        And Arasi Stefano, mat: 0001103134, email: arasi.stefano@studio.unibo.it
+        <img src="../img/marko.jpg" alt="mbot" width="15%" height="15%">
+        GIT repo: <a
+            href="https://github.com/Marko-Pyeshchyk/ISS_24.git">https://github.com/Marko-Pyeshchyk/ISS_24.git</a>
+    </div>
+</body>
+
+</html>

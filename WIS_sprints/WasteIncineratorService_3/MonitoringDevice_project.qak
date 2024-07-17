@@ -1,0 +1,140 @@
+System wis
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Dispatch burn_end:burn_end(X)
+Dispatch burn_start:burn_start(X)
+
+Event sonardata:sonardata(K)
+
+
+//Context ctx_wis ip [ host="localhost" port=8088 ]
+Context ctx_md ip [ host=/*"127.0.0.1"*/"localhost" port=8099 ]
+
+QActor wis context ctx_md{
+	State s0 initial{
+		println("START wis") color blue
+		delay 1000
+		forward monitoring_device -m burn_end:burn_end(X)
+		delay 1000
+		forward monitoring_device -m burn_start:burn_start(X)
+	}
+}
+
+QActor monitoring_device context ctx_md{
+	[#	val DLIMIT = 300L; 
+		var Distance = 9999L;
+		var burning = 0;
+		#]
+	State s0 initial{
+		println("START MonitoringDevice") color red
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+	
+	State handleStart {
+		[# burning = 1 #]
+		if [# Distance>DLIMIT #] {
+			forward led -m led_on:led_on(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleEnd {
+		[# burning = 0 #]
+		if [# Distance>DLIMIT #] {
+			forward led -m led_off:led_off(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleSonar{
+		onMsg(sonar_value:sonar_value(K)){
+			[# Distance = payloadArg(0).toLong() #]
+			println("DISTANCE: $Distance") color red
+			forward wis -m sonar_value:sonar_value($Distance)
+			if [# Distance<=DLIMIT #] {
+				forward led -m led_flashing:led_flashing(N)
+			} else {
+				if [# burning==1 #] {
+					forward led -m led_on:led_on(N)                             
+				}
+			}
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+}
+
+QActor led context ctx_md{
+	State s0 initial{
+		println("START led") color magenta
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+	State handleOn{
+		println("LED ON") color magenta
+		//turn on with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+	
+	State handleOff{
+		println("LED OFF") color magenta
+		//turn off with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+				  
+	State handleFlashing{
+		println("LED FLASHING") color magenta
+		//turn flashing with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+}
+
+QActor sonar context ctx_md{
+	State s0 initial{
+		println("START sonar") color green
+		delay 1000
+		subscribeTo sonar_device for sonardata
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+	
+	State handleSonar{
+		onMsg(sonardata:sonardata(K)){
+			[# var D = payloadArg(0) #]
+			forward monitoring_device -m sonar_value:sonar_value($D)
+		}
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+}
+
+QActor sonar_device context ctx_md{
+	State s0 initial{
+		println("START sonar_device") color yellow
+		[# var K= 1000 #]
+		delay 1500
+		emitlocalstream sonardata:sonardata($K)
+		delay 3000
+		[# K= 1 #]
+		emitlocalstream sonardata:sonardata($K)
+	}
+}

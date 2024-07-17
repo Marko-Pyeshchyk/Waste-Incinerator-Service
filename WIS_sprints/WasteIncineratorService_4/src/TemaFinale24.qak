@@ -1,0 +1,434 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch weight:weight(N)
+Event scale_data:scale_data(N)
+
+// monitornig device
+Dispatch burn_end:burn_end(X)
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Event sonardata:sonardata(K)
+
+// op robot
+Request engage        : engage(OWNER, STEPTIME)	
+Reply   engagedone    : engagedone(ARG)    for engage
+Reply   engagerefused : engagerefused(ARG) for engage
+Dispatch disengage    : disengage(ARG)
+
+Dispatch cmd    : cmd( MOVE )  "MOVE = a|d|l|r|h   "
+
+Request  cmd    : cmd(MOVE,T)  "MOVE = w|s|p (stepSynch)" 
+
+Reply cmddone   : cmddone(R)          for cmd
+Reply cmdfailed : cmdfailed(T,CAUSE)  for cmd
+
+Request step       : step(TIME)	
+Reply stepdone     : stepdone(V)                 for step
+Reply stepfailed   : stepfailed(DURATION, CAUSE) for step
+
+Request moverobot    :  moverobot(TARGETX, TARGETY)
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot 
+
+Dispatch take_RP : take_RP(X)
+Dispatch take_ash : take_RP(X)
+Dispatch go_home : take_RP(X)
+Dispatch work : work(X)
+
+Dispatch primo : primo(X)
+Dispatch secondo : secondo(X)
+Dispatch terzo : terzo(X)
+Dispatch quarto : quarto(X)
+Dispatch quinto : quinto(X)
+
+// context
+Context ctxwis  ip [host="localhost" port=8080] 
+Context ctxbrobot ip [host="127.0.0.1" port=8020] 
+
+ExternalQActor basicrobot context ctxbrobot 
+
+QActor op_robot  context ctxwis {
+	[# 
+		var X = 0
+		var Y = 0
+		#
+	]    
+	State s0 initial {
+		println("$name	START") color cyan
+		delay 500
+		subscribeTo incinerator for burn_end
+		request basicrobot -m engage : engage($MyName,137)
+	}
+	Transition t0 whenReply engagedone -> ready
+				  whenReply engagerefused -> end
+	
+	State end {
+		println("$name ENDS ") color cyan
+	}
+	
+	State ready {
+			println("$name	READY") color cyan
+			forward wis_mock -m work:work(waiting_home)
+			forward basicrobot -m cmd:cmd(a)
+			forward basicrobot -m cmd:cmd(d)
+	}
+	Transition t1 whenMsg take_RP -> menage_RP
+				  whenMsg go_home -> going_HOME
+				  whenMsg take_ash -> menage_ash
+	
+	
+	State menage_RP {
+		[#
+			X = 0
+			Y = 4
+		#]
+		forward wis_mock -m work:work(moving_to_WASTEIN)
+		request basicrobot -m  moverobot : moverobot(0,4)
+	}
+	Transition t0 //whenTime 5000 -> menage_RP
+				  whenReply moverobotdone -> menage_RP2
+				  whenReply moverobotfailed -> handle_obstacle
+	
+	State menage_RP2 {
+		[#
+			X = 3
+			Y = 1
+		#]
+		forward wis_mock -m work:work(taking_RP)
+		delay 1000
+		forward wis_mock -m work:work(moving_to_BURNIN)
+		request basicrobot -m  moverobot : moverobot(3,1)
+	}
+	Transition t0 whenReply moverobotdone -> menage_RP3
+				  whenReply moverobotfailed -> handle_obstacle
+		
+	State menage_RP3 {
+		forward wis_mock -m work:work(waste_in_incinerator)
+		delay 1000
+	}
+	Goto going_HOME
+	
+	State menage_ash {
+		[#
+			X = 5
+			Y = 3
+		#]
+		forward wis_mock -m work:work(moving_to_BURNOUT)
+		request basicrobot -m  moverobot : moverobot(5,3)
+	}
+	Transition t0 whenReply moverobotdone -> menage_ash2
+				  whenReply moverobotfailed -> handle_obstacle
+	
+	State menage_ash2 {
+		[#
+			X = 6
+			Y = 4
+		#]
+		forward wis_mock -m work:work(taking_ash)
+		delay 2000
+		forward wis_mock -m work:work(moving_to_ASHOUT)
+		request basicrobot -m  moverobot : moverobot(6,4)
+	}
+	Transition t0 whenReply moverobotdone -> menage_ash3
+				  whenReply moverobotfailed -> handle_obstacle
+		
+	State menage_ash3 {
+		forward wis_mock -m work:work(dumping_ash)
+		delay 1000
+	}
+	Goto ready
+	
+	State going_HOME {
+		[#
+			X = 0
+			Y = 0
+		#]
+		println("GOING HOME GOING HOME GOING HOME") color cyan
+		forward wis_mock -m work:work(going_home)
+		delay 2000
+		request basicrobot -m  moverobot : moverobot(0,0)
+		
+		 //forward basicrobot -m disengage : disengage($MyName)
+		 //[# System.exit(0) #]
+	}
+	Transition t0 whenReply moverobotdone -> ready
+				  whenReply moverobotfailed -> handle_obstacle
+	
+ 
+	State handle_obstacle {
+		println("$name	OBSTACLE hit") color cyan
+		delay 3000
+		if [# X==0 && Y==4 #] {
+			autodispatch primo:primo(a)
+		}else{
+			if [# X==3 && Y==1 #] {
+				autodispatch secondo:secondo(a)
+			}else{
+				if [# X==5 && Y==3 #] {
+					autodispatch terzo:terzo(a)
+				}else{
+					if [# X==6 && Y==4 #] {
+						autodispatch quarto:quarto(a)
+					}else{
+						if [# X==0 && Y==0 #] {
+							autodispatch quinto:quinto(a)
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	Transition t0 whenMsg primo -> menage_RP
+				  whenMsg secondo -> menage_RP2
+				  whenMsg terzo -> menage_ash
+				  whenMsg quarto -> menage_ash2
+				  whenMsg quinto -> going_HOME
+}
+ 
+ 
+// waste storage
+QActor waste_storage  context ctxwis {    
+	State s0 initial {
+		println("$name	START") color yellow
+		delay 1000 
+		subscribeTo scale_device for scale_data
+	}
+	Transition t1 whenEvent scale_data -> handle_data
+	
+	State handle_data{
+		onMsg( scale_data : scale_data(W) ){
+			[# var W = payloadArg(0) #]
+			println("$name	sending weight: $W") color yellow
+			forward wis_mock -m weight:weight($W)
+		}
+	}
+	Transition t1 whenEvent scale_data -> handle_data
+}
+
+QActor scale_device  context ctxwis {    
+	[# 
+		var Last=0 
+		var New=50 
+		#
+	]
+	
+	State s0 initial {
+		println("$name	START") color yellow
+	} Goto work
+	
+	State work {
+		delay 3000
+		if [# Last != New #] {
+			[# Last = New #] 
+			emitlocalstream scale_data : scale_data($New) 
+		}
+	} Goto work
+}
+
+// incinerator
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 3000L #]
+	State s0 initial {
+		println("$name	START") color red
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		println("$name	burning...") color red
+		delayVar BTIME
+		println("$name	burn end") color red
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	State s0 initial {
+		println("$name		START") color green
+		subscribeTo incinerator for burn_end
+		delay 1000
+		forward monitoring_device -m burn_end:burn_end(X)
+		delay 1000
+		forward monitoring_device -m burn_start:burn_start(X)
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward op_robot -m take_RP:take_RP(X)
+		delay 15000
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward op_robot -m take_ash:take_ash(X)
+		delay 15000
+		forward incinerator -m ash_taken:ash_taken(N)
+		
+		forward op_robot -m go_home:go_home(X)
+	}
+}
+
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+// monitornig device
+
+QActor monitoring_device context ctxwis{
+	[#	val DLIMIT = 300;
+		var max_dist = 0
+		var Distance = 999;
+		var burning = 0;
+		#]
+	State s0 initial{
+		println("START MonitoringDevice") color red
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+	
+	State handleStart {
+		[# burning = 1 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_on:led_on(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleEnd {
+		[# burning = 0 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_off:led_off(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleSonar{
+		onMsg(sonar_value:sonar_value(K)){
+			[# Distance = payloadArg(0).toInt() #]
+			println("DISTANCE: $Distance") color red
+			forward wis_mock -m sonar_value:sonar_value($Distance)
+			if [# max_dist<Distance #] {
+				[# max_dist=Distance #]
+			}
+			if [# Distance<=DLIMIT #] {
+				forward led -m led_flashing:led_flashing(N)
+			} else {
+				if [# max_dist==Distance #] {
+					forward led -m led_flashing:led_flashing(N)
+				} else {
+					if [# burning==1 #] {
+						forward led -m led_on:led_on(N)                             
+					} else {
+						forward led -m led_off:led_off(N)
+					}
+				}
+			}
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+}
+
+QActor led context ctxwis{
+	State s0 initial{
+		println("START led") color magenta
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+	State handleOn{
+		println("LED ON") color magenta
+		//turn on with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+	
+	State handleOff{
+		println("LED OFF") color magenta
+		//turn off with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+				  
+	State handleFlashing{
+		println("LED FLASHING") color magenta
+		//turn flashing with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+}
+
+QActor sonar context ctxwis{
+	State s0 initial{
+		println("START sonar") color green
+		delay 1000
+		subscribeTo sonar_device for sonardata
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+	
+	State handleSonar{
+		onMsg(sonardata:sonardata(K)){
+			[# var D = payloadArg(0) #]
+			forward monitoring_device -m sonar_value:sonar_value($D)
+		}
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+}
+
+QActor sonar_device context ctxwis{
+	State s0 initial{
+		println("START sonar_device") color yellow
+		[# var K= 1000 #]
+		delay 1500
+		emitlocalstream sonardata:sonardata($K)
+		delay 3000
+		[# K= 1 #]
+		emitlocalstream sonardata:sonardata($K)
+		delay 3000
+		[# K= 500 #]
+		emitlocalstream sonardata:sonardata($K)
+	}
+}

@@ -1,0 +1,151 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch weight:weight(N)
+Event scale_data:scale_data(N)
+
+// monitoring device
+Dispatch burn_end:burn_end(X)
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Event sonardata:sonardata(K)
+
+// op robot
+Request engage        : engage(OWNER, STEPTIME)	
+Reply   engagedone    : engagedone(ARG)    for engage
+Reply   engagerefused : engagerefused(ARG) for engage
+Dispatch disengage    : disengage(ARG)
+
+Request moverobot    :  moverobot(TARGETX, TARGETY)
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot 
+
+Dispatch take_RP : take_RP(X)
+Dispatch take_ash : take_RP(X)
+Dispatch go_home : take_RP(X)
+Dispatch work : work(X)
+
+
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+Context ctxext  ip [host="127.0.0.1" port=8081]
+Context ctxmd  ip [host="127.0.0.1" port=8082]
+Context ctxbrobot  ip [host="127.0.0.1" port=8083]
+
+// op robot
+ExternalQActor basicrobot context ctxbrobot 
+
+QActor op_robot  context ctxwis {    
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+		request basicrobot -m engage : engage($MyName,137)
+		forward wis -m work:work(waiting_home)
+		request basicrobot -m  moverobot : moverobot(0,4)
+	}
+	Transition t0    
+	    whenReply engagedone -> s0
+	    whenReply engagerefused -> s0
+	    whenReply moverobotdone -> s0
+	    whenReply engagerefused -> s0
+}
+
+// waste storage
+QActor waste_storage  context ctxwis {    
+	State s0 initial {
+		subscribeTo scale_device for scale_data
+		forward wis -m weight:weight(N)
+	}
+}
+
+QActor scale_device  context ctxwis {    
+	State s0 initial {
+		emitlocalstream scale_data : scale_data(N) 
+	}
+}
+
+// incinerator
+QActor incinerator  context ctxwis {    
+	State s0 initial {
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	
+	State ready {
+		forward wis -m activation_command:activation_command(0)
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		emit burn_end:burn_end(0) 
+	}
+	
+}
+
+// wis
+QActor wis context ctxwis {
+	
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+		forward incinerator -m burn_start:burn_start(N)
+		forward incinerator -m ash_taken:ash_taken(N)
+		forward monitoring_device -m burn_end:burn_end(X)
+		forward monitoring_device -m burn_start:burn_start(X)
+		forward op_robot -m take_RP:take_RP(X)
+		forward op_robot -m take_ash:take_ash(X)
+		forward op_robot -m go_home:go_home(X)
+	}
+}
+
+
+QActor activator_mock context ctxext {
+	State s0 initial {
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+
+// monitornig device
+QActor monitoring_device context ctxmd{
+	State s0 initial{
+		println("START MonitoringDevice") color red
+		forward wis -m sonar_value:sonar_value(K)
+		forward led -m led_on:led_on(N)
+		forward led -m led_off:led_off(N)
+		forward led -m led_flashing:led_flashing(N)
+	}
+}
+
+QActor led context ctxmd{
+	State s0 initial{
+		println("START led") color magenta
+	}
+}
+
+QActor sonar context ctxmd{
+	State s0 initial{
+		println("START sonar") color green
+		forward monitoring_device -m sonar_value:sonar_value(K)
+		subscribeTo sonar_device for sonardata
+	}
+}
+
+QActor sonar_device context ctxmd{
+	State s0 initial{
+		println("START sonar_device") color yellow
+		emitlocalstream sonardata:sonardata(K)
+	}
+}
+

@@ -1,0 +1,43 @@
+digraph wis24Arch {
+	graph [fontcolor="#2D3436" fontname="Sans-Serif" fontsize=22 label=wis24Arch nodesep=0.60 pad=2.0 rankdir=LR ranksep=0.75 splines=ortho]
+	node [fixedsize=true fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13 height=1.4 imagescale=true labelloc=b shape=box style=rounded width=1.4]
+	edge [color="#7B8894"]
+	"587d9c660b0a4183975de56a38ebff9f" -> "2013191446da42ba8dba5800936d60aa" [label=burn_end color=red decorate=true dir=forward fontcolor=red fontname="Sans-Serif" fontsize=13 style=dotted]
+	"366b05f6a7a74db6b5df11e8c63f8adc" -> "36f3e59592c7408cb371e28bedb358d2" [label=scale_data color=red decorate=true dir=forward fontcolor=red fontname="Sans-Serif" fontsize=13 style=dotted]
+	"587d9c660b0a4183975de56a38ebff9f" -> f045000c27f743e6b3fad2b3f92fd4c4 [label=burn_end color=red decorate=true dir=forward fontcolor=red fontname="Sans-Serif" fontsize=13 style=dotted]
+	"587d9c660b0a4183975de56a38ebff9f" -> "8dbe667052e84b3684380e34951cc0b8" [label=burn_end color=red decorate=true dir=forward fontcolor=red fontname="Sans-Serif" fontsize=13 style=dotted]
+	"33569c18a3054ca8839cf48676ac02fe" -> "6dc50523cdd44a32870a6b7af5a0f347" [label=sonardata color=red decorate=true dir=forward fontcolor=red fontname="Sans-Serif" fontsize=13 style=dotted]
+	"2013191446da42ba8dba5800936d60aa" -> "0724b90d966a472cbe8ebe873ec427bf" [label=<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; > color=magenta decorate=true dir=forward fontcolor=magenta fontname="Sans-Serif" fontsize=13 style=solid]
+	"681427ee0c1047d38b0333f9337731d0" -> "50bffde035c34bf0bba8cbd42e12cab7" [label=<led_on &nbsp; led_off &nbsp; led_flashing &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"2013191446da42ba8dba5800936d60aa" -> "8dbe667052e84b3684380e34951cc0b8" [label=<work &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"6dc50523cdd44a32870a6b7af5a0f347" -> "681427ee0c1047d38b0333f9337731d0" [label=<sonar_value &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"681427ee0c1047d38b0333f9337731d0" -> "8dbe667052e84b3684380e34951cc0b8" [label=<sonar_value &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"8dbe667052e84b3684380e34951cc0b8" -> "587d9c660b0a4183975de56a38ebff9f" [label=<burn_start &nbsp; ash_taken &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"2013191446da42ba8dba5800936d60aa" -> "0724b90d966a472cbe8ebe873ec427bf" [label=<cmd<font color="darkgreen"> cmddone cmdfailed</font> &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"8dbe667052e84b3684380e34951cc0b8" -> "2013191446da42ba8dba5800936d60aa" [label=<take_RP &nbsp; take_ash &nbsp; go_home &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"36f3e59592c7408cb371e28bedb358d2" -> "8dbe667052e84b3684380e34951cc0b8" [label=<weight &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"72b62fc6ba5f47e09eceb8e407baed54" -> "587d9c660b0a4183975de56a38ebff9f" [label=<activation_command &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"8dbe667052e84b3684380e34951cc0b8" -> "681427ee0c1047d38b0333f9337731d0" [label=<burn_start &nbsp; burn_end &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	"587d9c660b0a4183975de56a38ebff9f" -> "8dbe667052e84b3684380e34951cc0b8" [label=<activation_command &nbsp; > color=blue decorate=true dir=forward fontcolor=blue fontname="Sans-Serif" fontsize=13 style=solid]
+	subgraph cluster_env {
+		graph [bgcolor="#E5F5FD" fontname="Sans-Serif" fontsize=12 label=env labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+		f045000c27f743e6b3fad2b3f92fd4c4 [label="" height=1.9 image="./qakicons/system.png" shape=none]
+		subgraph cluster_ctxwis {
+			graph [bgcolor=lightyellow fontname="Sans-Serif" fontsize=22 label=ctxwis labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+			"2013191446da42ba8dba5800936d60aa" [label=op_robot height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"36f3e59592c7408cb371e28bedb358d2" [label=waste_storage height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"366b05f6a7a74db6b5df11e8c63f8adc" [label=scale_device height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"587d9c660b0a4183975de56a38ebff9f" [label=incinerator height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"8dbe667052e84b3684380e34951cc0b8" [label=wis height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"72b62fc6ba5f47e09eceb8e407baed54" [label=activator_mock height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"681427ee0c1047d38b0333f9337731d0" [label=monitoring_device height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"50bffde035c34bf0bba8cbd42e12cab7" [label=led height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"6dc50523cdd44a32870a6b7af5a0f347" [label=sonar height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+			"33569c18a3054ca8839cf48676ac02fe" [label=sonar_device height=1.9 image="./qakicons/symActorSmall.png" shape=none]
+		}
+		subgraph cluster_ctxbrobot {
+			graph [bgcolor=lightyellow fontname="Sans-Serif" fontsize=22 label=ctxbrobot labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+			"0724b90d966a472cbe8ebe873ec427bf" [label="basicrobot(ext)" height=1.9 image="./qakicons/externalQActor.png" shape=none]
+		}
+	}
+}

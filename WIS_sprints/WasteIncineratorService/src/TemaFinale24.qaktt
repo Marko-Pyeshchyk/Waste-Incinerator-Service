@@ -1,0 +1,48 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+Context ctxwis  ip [host="localhost" port=8080]
+Context ctxbasicrobot ip [host="127.0.0.1"  port=8020   ]  
+
+ExternalQActor basicrobot context ctxbasicrobot 
+
+QActor wis context ctxwis {    
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+	}
+}
+
+QActor incinerator  context ctxwis {    
+	State s0 initial {
+		emit burn_end:burn_end(0) 
+	}
+}
+
+QActor op_robot context ctxwis {    
+	
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+	} 
+}
+
+QActor waste_storage context ctxwis {    
+	
+	State s0 initial {} 
+}
+
+
+
+QActor monitoring_device context ctxwis {    
+	State s0 initial {
+		
+	}
+}
+
+QActor led context ctxwis {    
+	State s0 initial {}
+}
+
+QActor sonar context ctxwis {    
+	State s0 initial {}
+}

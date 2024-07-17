@@ -1,0 +1,12 @@
+{"actor":"led", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleOn", "msgId":"led_on"}
+{"actor":"led", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleOff", "msgId":"led_off"}
+{"actor":"led", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleFlashing", "msgId":"led_flashing"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOn", "nextstate":"handleOn", "msgId":"led_on"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOn", "nextstate":"handleOff", "msgId":"led_off"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOn", "nextstate":"handleFlashing", "msgId":"led_flashing"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOff", "nextstate":"handleOn", "msgId":"led_on"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOff", "nextstate":"handleOff", "msgId":"led_off"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleOff", "nextstate":"handleFlashing", "msgId":"led_flashing"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleOn", "msgId":"led_on"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleOff", "msgId":"led_off"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleFlashing", "msgId":"led_flashing"}
