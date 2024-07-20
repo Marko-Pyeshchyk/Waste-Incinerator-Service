@@ -1,0 +1,92 @@
+System wis24_test_incinerator
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+Dispatch event_sent:event_sent(X)
+Request test_data:test_data(X)
+Reply send_data:send_data(X) for test_data
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+
+
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 2000L #]
+	State s0 initial {
+		println("$name	START") color red
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		println("$name	burning") color red
+		delayVar BTIME
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	State s0 initial {
+		println("$name		START") color green
+		subscribeTo incinerator for burn_end
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward incinerator -m ash_taken:ash_taken(N)
+		updateResource [# "event_sent(done)" #]
+	}
+}
+
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor test_observer context ctxwis {
+	[# var A : String = "" #]
+	State s0 initial {
+		delay 1000
+		observeResource wis_mock msgid event_sent
+	}
+	Transition t0 whenMsg event_sent -> notify
+		
+	State notify {
+		onMsg(event_sent:event_sent(X)){
+			[# A = payloadArg(0) #]
+			println("$A") color cyan
+		}
+	}
+	Transition t0 whenRequest test_data -> send_data
+	
+	State send_data {
+		replyTo test_data with send_data:send_data($A)
+		[# System.exit(0) #]
+	}
+}

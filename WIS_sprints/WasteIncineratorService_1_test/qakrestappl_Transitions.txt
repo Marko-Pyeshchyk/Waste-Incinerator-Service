@@ -1,0 +1,5 @@
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"activated", "msgId":"activation_command"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"ready", "nextstate":"burning", "msgId":"burn_start"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"burning", "nextstate":"ready", "msgId":"ash_taken"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"s0", "nextstate":"ready", "msgId":"activation_command"}
+{"actor":"test_observer", "msgType":"dispatch", "curstate":"s0", "nextstate":"notify", "msgId":"event_sent"}

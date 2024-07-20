@@ -1,0 +1,110 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch weight:weight(N)
+Event scale_data:scale_data(N)
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+
+// waste storage
+QActor waste_storage  context ctxwis {    
+	State s0 initial {
+		println("$name	START") color yellow
+		delay 1000 
+		subscribeTo scale_device for scale_data
+	}
+	Transition t1 whenEvent scale_data -> handle_data
+	
+	State handle_data{
+		onMsg( scale_data : scale_data(W) ){
+			[# var W = payloadArg(0) #]
+			println("$name	sending weight: $W") color yellow
+			forward wis_mock -m weight:weight($W)
+		}
+	}
+	Transition t1 whenEvent scale_data -> handle_data
+}
+
+QActor scale_device  context ctxwis {    
+	[# 
+		var Last = 0
+		var New = 50
+		val THRESHOLD = 5
+		#
+	]
+	
+	State s0 initial {
+		println("$name	START") color yellow
+	} Goto work
+	
+	State work {
+		delay 3000
+		[# var diff =  kotlin.math.abs(Last - New) #]
+		if [# diff > THRESHOLD #] {
+			[# Last = New #] 
+			emitlocalstream scale_data : scale_data($New) 
+		}
+	} Goto work
+}	
+
+// incinerator
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 2000L #]
+	State s0 initial {
+		println("$name	START") color red
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		println("$name	burning") color red
+		delayVar BTIME
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	State s0 initial {
+		println("$name		START") color green
+		subscribeTo incinerator for burn_end
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward incinerator -m ash_taken:ash_taken(N)
+	}
+}
+
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
