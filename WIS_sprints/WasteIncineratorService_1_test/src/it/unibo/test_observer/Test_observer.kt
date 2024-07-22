@@ -51,6 +51,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				state("send_data") { //this:State
 					action { //it:State
 						answer("test_data", "send_data", "send_data($A)"   )  
+						CommUtils.outcyan("END????")
 						 System.exit(0)  
 						//genTimer( actor, state )
 					}

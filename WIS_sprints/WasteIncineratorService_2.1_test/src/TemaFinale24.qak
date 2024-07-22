@@ -1,0 +1,194 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch rp_number:rp_number(N)
+Dispatch kg:kg(N)
+Dispatch remove_rp:remove_rp(N)
+
+// test
+Request test_request:test_request(N)
+Reply test_reply:test_reply(N) for test_request
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+
+// waste storage
+QActor waste_storage  context ctxwis {   
+	[# var RP:Int = 0 #]
+	 
+	State s0 initial {
+		println("$name	START") color yellow
+		delay 1000 
+	}
+	Transition t1 whenMsg kg -> convert_kg
+				  whenMsg remove_rp -> remove_rp
+	
+	State convert_kg{
+		onMsg( kg : kg(N) ){
+			[# 
+				var KG = payloadArg(0).toFloat()
+				RP += kotlin.math.round(KG/50).toInt()
+			#]
+			println("$name	+$KG Kg ===> $RP RP") color yellow
+			forward wis_mock -m rp_number:rp_number($RP)
+		}
+	}
+	Transition t1 whenMsg kg -> convert_kg
+				  whenMsg remove_rp -> remove_rp
+				  
+	State remove_rp {
+		[# RP -= 1 #]
+	}
+	Transition t1 whenMsg kg -> convert_kg
+				  whenMsg remove_rp -> remove_rp
+}
+
+
+// incinerator
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 1000L #]
+	State s0 initial {
+		println("$name	START") color red
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		println("$name	burning") color red
+		delayVar BTIME
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	[# var RP:Int = 0 #]
+	
+	State s0 initial {
+		println("$name		START") color green
+		subscribeTo incinerator for burn_end
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward incinerator -m ash_taken:ash_taken(N)
+		delay 5000
+	}
+	Transition t1 whenMsg rp_number -> show_rp
+	
+	State show_rp {
+		onMsg( rp_number : rp_number(N) ){
+			[# RP = payloadArg(0).toInt() #]
+			println("$name		number of RP in the system: $RP") color green
+			updateResource [#"rp_number($RP)"#]
+		}
+	}
+	Transition t1 whenMsg rp_number -> show_rp
+	
+	State remove_rp {
+		[# var R = -50 #]
+		forward waste_storage -m kg:kg($R)
+	}
+}
+
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor external_agent_ws context ctxwis {
+	[# var KG:Float #]
+	
+	State s0 initial {
+		println("$name		START") color yellow
+	}
+	Transition t1 whenMsg kg -> send_kg
+	
+	State send_kg {
+		onMsg( kg : kg(N) ){
+			[# KG = payloadArg(0).toFloat() #]
+			forward waste_storage -m kg:kg($KG)
+		}
+	}
+	Transition t1 whenMsg kg -> send_kg
+}
+
+
+
+QActor test_observer context ctxwis {
+	[# var A : String = "aaa" 
+		var N = 0
+		#
+	]
+	
+	State s0 initial {
+		delay 1000
+		observeResource wis_mock msgid rp_number
+	}
+	Transition t0 whenRequest test_request -> notify1
+		
+	State notify1 {
+		onMsg(test_request:test_request(N)){
+			[# A = payloadArg(0) #]
+		}
+		forward external_agent_ws -m kg:kg($A)
+	}
+	Transition t0 whenMsg rp_number -> send_data1
+	
+	State send_data1 {
+		onMsg(rp_number:rp_number(X)){
+			[# A = payloadArg(0) #]
+			replyTo test_request with test_reply:test_reply($A)
+		}
+	}
+	Transition t0 whenRequest test_request -> notify2
+	
+	State notify2 {
+		onMsg(test_request:test_request(N)){
+			[# A = payloadArg(0) #]
+		}
+		forward external_agent_ws -m kg:kg($A)
+	}
+	Transition t0 whenMsg rp_number -> send_data2
+	
+	State send_data2 {
+		onMsg(rp_number:rp_number(X)){
+			[# A = payloadArg(0) #]
+			replyTo test_request with test_reply:test_reply($A)
+		}
+	}
+	Goto end
+	
+	State end {
+		println("ending.......") color red
+		[# System.exit(0) #]
+	}
+	
+}

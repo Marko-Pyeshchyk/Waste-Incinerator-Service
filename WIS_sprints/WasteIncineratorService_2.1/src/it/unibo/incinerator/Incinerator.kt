@@ -21,49 +21,34 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 var BTIME = 2000L  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outred("$name	START")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t12",targetState="activated",cond=whenDispatch("activation_command"))
-				}	 
-				state("activated") { //this:State
-					action { //it:State
-						forward("activation_command", "activation_command(N)" ,"wis_mock" ) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="ready", cond=doswitch() )
+					 transition(edgeName="t10",targetState="ready",cond=whenDispatch("activation_command"))
 				}	 
 				state("ready") { //this:State
 					action { //it:State
-						CommUtils.outred("$name	READY")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t13",targetState="burning",cond=whenDispatch("burn_start"))
-				}	 
-				state("burning") { //this:State
-					action { //it:State
-						CommUtils.outred("$name	burning")
-						delay(BTIME)
 						emit("burn_end", "burn_end(0)" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t14",targetState="ready",cond=whenDispatch("ash_taken"))
+					 transition(edgeName="t11",targetState="burning",cond=whenDispatch("burn_start"))
+				}	 
+				state("burning") { //this:State
+					action { //it:State
+						emit("burn_end", "burn_end(0)" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

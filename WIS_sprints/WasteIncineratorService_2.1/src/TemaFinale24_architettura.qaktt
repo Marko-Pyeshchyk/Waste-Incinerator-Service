@@ -8,22 +8,16 @@ Dispatch burn_start:burn_start(N)
 Dispatch ash_taken:ash_taken(N)
 
 // waste storage
-Dispatch weight:weight(N)
-Event scale_data:scale_data(N)
+Dispatch rp_number:rp_number(N)
+Dispatch kg:kg(N)
 
 Context ctxwis  ip [host="localhost" port=8080] 
 Context ctxext  ip [host="127.0.0.1" port=8081]
+Context ctxext2  ip [host="127.0.0.1" port=8082]
  
 QActor waste_storage  context ctxwis {    
 	State s0 initial {
-		subscribeTo scale_device for scale_data
-		forward wis_mock -m weight:weight(N)
-	}
-}
-
-QActor scale_device  context ctxwis {    
-	State s0 initial {
-		emitlocalstream scale_data : scale_data(N) 
+		forward wis_mock -m rp_number:rp_number(N)
 	}
 }
 
@@ -50,11 +44,19 @@ QActor wis_mock context ctxwis {
 		subscribeTo incinerator for burn_end
 		forward incinerator -m burn_start:burn_start(N)
 		forward incinerator -m ash_taken:ash_taken(N)
+		forward waste_storage -m kg:kg(N)
 	}
 }
 
+// external agents
 QActor activator_mock context ctxext {
 	State s0 initial {
 		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor external_agent_ws context ctxext2 {
+	State s0 initial {
+		forward waste_storage -m kg:kg(N)
 	}
 }

@@ -1,0 +1,61 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch rp_number:rp_number(N)
+Dispatch kg:kg(N)
+
+Context ctxwis  ip [host="localhost" port=8080] 
+Context ctxext  ip [host="127.0.0.1" port=8081]
+Context ctxext2  ip [host="127.0.0.1" port=8082]
+ 
+QActor waste_storage  context ctxwis {    
+	State s0 initial {
+		forward wis_mock -m rp_number:rp_number(N)
+	}
+}
+
+QActor incinerator  context ctxwis {    
+	State s0 initial {
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	
+	State ready {
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		emit burn_end:burn_end(0) 
+	}
+	
+}
+
+QActor wis_mock context ctxwis {
+	
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+		forward incinerator -m burn_start:burn_start(N)
+		forward incinerator -m ash_taken:ash_taken(N)
+		forward waste_storage -m kg:kg(N)
+	}
+}
+
+QActor activator_mock context ctxext {
+	State s0 initial {
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor externar_agent_ws context ctxext2 {
+	State s0 initial {
+		forward waste_storage -m kg:kg(N)
+	}
+}

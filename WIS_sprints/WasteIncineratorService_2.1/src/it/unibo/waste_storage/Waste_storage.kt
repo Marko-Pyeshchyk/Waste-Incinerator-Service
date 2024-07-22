@@ -24,30 +24,12 @@ class Waste_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name	START")
-						delay(1000) 
-						subscribeToLocalActor("scale_device") 
+						forward("rp_number", "rp_number(N)" ,"wis_mock" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t10",targetState="handle_data",cond=whenEvent("scale_data"))
-				}	 
-				state("handle_data") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("scale_data(N)"), Term.createTerm("scale_data(W)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var W = payloadArg(0)  
-								CommUtils.outyellow("$name	sending weight: $W")
-								forward("weight", "weight($W)" ,"wis_mock" ) 
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t11",targetState="handle_data",cond=whenEvent("scale_data"))
 				}	 
 			}
 		}

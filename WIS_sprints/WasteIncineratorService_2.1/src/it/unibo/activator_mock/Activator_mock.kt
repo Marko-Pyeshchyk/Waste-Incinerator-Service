@@ -24,7 +24,6 @@ class Activator_mock ( name: String, scope: CoroutineScope, isconfined: Boolean=
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
 						forward("activation_command", "activation_command(N)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}

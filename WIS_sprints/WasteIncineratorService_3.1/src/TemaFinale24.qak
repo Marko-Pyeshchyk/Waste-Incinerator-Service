@@ -1,0 +1,260 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+// waste storage
+Dispatch rp_number:rp_number(N)
+Dispatch kg:kg(N)
+
+// monitornig device
+Dispatch burn_end:burn_end(X)
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Event sonardata:sonardata(K)
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+
+// waste storage
+QActor waste_storage  context ctxwis {   
+	[# var RP:Int = 0 #]
+	 
+	State s0 initial {
+		println("$name	START") color yellow
+		delay 1000 
+	}
+	Transition t1 whenMsg kg -> convert_kg
+	
+	State convert_kg{
+		onMsg( kg : kg(N) ){
+			[# 
+				var KG = payloadArg(0).toFloat()
+				RP += kotlin.math.round(KG/50).toInt()
+			#]
+			println("$name	$KG Kg ===> $RP RP") color yellow
+			forward wis_mock -m rp_number:rp_number($RP)
+		}
+	}
+	Transition t1 whenMsg kg -> convert_kg
+}
+
+
+
+// incinerator
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 2000L #]
+	State s0 initial {
+		println("$name	START") color red
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		println("$name	burning") color red
+		delayVar BTIME
+		emit burn_end:burn_end(0) 
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	[# var RP:Int = 0 #]
+	
+	State s0 initial {
+		println("$name		START") color green
+		subscribeTo incinerator for burn_end
+		delay 1000
+		forward monitoring_device -m burn_end:burn_end(X)
+		delay 1000
+		forward monitoring_device -m burn_start:burn_start(X)
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward incinerator -m ash_taken:ash_taken(N)
+	}
+	Transition t1 whenMsg rp_number -> update_rp
+	
+	State update_rp {
+		onMsg( rp_number : rp_number(N) ){
+			[# RP = payloadArg(0).toInt() #]
+			println("$name		number of RP in the system: $RP") color green
+		}
+	}
+	Transition t1 whenMsg rp_number -> update_rp
+	
+	State remove_rp {
+	[# var R = -50 #]
+		forward waste_storage -m kg:kg($R)
+	}
+}
+
+// external agents
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor external_agent_ws context ctxwis {
+	State s0 initial {
+		delay 1000
+		forward waste_storage -m kg:kg(102)
+		forward waste_storage -m kg:kg(51)
+	}
+}
+
+// monitornig device
+
+QActor monitoring_device context ctxwis{
+	[#	val DLIMIT = 300;
+		var max_dist = 0
+		var Distance = 999;
+		var burning = 0;
+		#]
+	State s0 initial{
+		println("START MonitoringDevice") color red
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+	
+	State handleStart {
+		[# burning = 1 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_on:led_on(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleEnd {
+		[# burning = 0 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_off:led_off(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleSonar{
+		onMsg(sonar_value:sonar_value(K)){
+			[# Distance = payloadArg(0).toInt() #]
+			println("DISTANCE: $Distance") color red
+			forward wis_mock -m sonar_value:sonar_value($Distance)
+			if [# max_dist<Distance #] {
+				[# max_dist=Distance #]
+			}
+			if [# Distance<=DLIMIT #] {
+				forward led -m led_flashing:led_flashing(N)
+			} else {
+				if [# max_dist==Distance #] {
+					forward led -m led_flashing:led_flashing(N)
+				} else {
+					if [# burning==1 #] {
+						forward led -m led_on:led_on(N)                             
+					} else {
+						forward led -m led_off:led_off(N)
+					}
+				}
+			}
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+}
+
+QActor led context ctxwis{
+	State s0 initial{
+		println("START led") color magenta
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+	State handleOn{
+		println("LED ON") color magenta
+		//turn on with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+	
+	State handleOff{
+		println("LED OFF") color magenta
+		//turn off with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+				  
+	State handleFlashing{
+		println("LED FLASHING") color magenta
+		//turn flashing with python
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+}
+
+QActor sonar context ctxwis{
+	State s0 initial{
+		println("START sonar") color green
+		delay 1000
+		subscribeTo sonar_device for sonardata
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+	
+	State handleSonar{
+		onMsg(sonardata:sonardata(K)){
+			[# var D = payloadArg(0) #]
+			forward monitoring_device -m sonar_value:sonar_value($D)
+		}
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+}
+
+QActor sonar_device context ctxwis{
+	State s0 initial{
+		println("START sonar_device") color yellow
+		[# var K= 1000 #]
+		delay 1500
+		emitlocalstream sonardata:sonardata($K)
+		delay 3000
+		[# K= 1 #]
+		emitlocalstream sonardata:sonardata($K)
+	}
+}

@@ -1,0 +1,16 @@
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"s0", "nextstate":"convert_kg", "msgId":"kg"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"s0", "nextstate":"remove_rp", "msgId":"remove_rp"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"convert_kg", "nextstate":"convert_kg", "msgId":"kg"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"convert_kg", "nextstate":"remove_rp", "msgId":"remove_rp"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"remove_rp", "nextstate":"convert_kg", "msgId":"kg"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"remove_rp", "nextstate":"remove_rp", "msgId":"remove_rp"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"activated", "msgId":"activation_command"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"ready", "nextstate":"burning", "msgId":"burn_start"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"burning", "nextstate":"ready", "msgId":"ash_taken"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"s0", "nextstate":"ready", "msgId":"activation_command"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"retrieve_ash", "nextstate":"show_rp", "msgId":"rp_number"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"show_rp", "nextstate":"show_rp", "msgId":"rp_number"}
+{"actor":"external_agent_ws", "msgType":"dispatch", "curstate":"s0", "nextstate":"send_kg", "msgId":"kg"}
+{"actor":"external_agent_ws", "msgType":"dispatch", "curstate":"send_kg", "nextstate":"send_kg", "msgId":"kg"}
+{"actor":"test_observer", "msgType":"dispatch", "curstate":"notify1", "nextstate":"send_data1", "msgId":"rp_number"}
+{"actor":"test_observer", "msgType":"dispatch", "curstate":"notify2", "nextstate":"send_data2", "msgId":"rp_number"}

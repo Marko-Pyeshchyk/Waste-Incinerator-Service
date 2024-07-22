@@ -22,8 +22,9 @@ class Scale_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var Last=0 
-				var New=50 
+				var Last = 0
+				var New = 50
+				val THRESHOLD = 5
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -38,7 +39,8 @@ class Scale_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				state("work") { //this:State
 					action { //it:State
 						delay(3000) 
-						if(  Last != New  
+						 var diff =  kotlin.math.abs(Last - New)  
+						if(  diff > THRESHOLD  
 						 ){ Last = New  
 						emitLocalStreamEvent("scale_data", "scale_data($New)" ) 
 						}

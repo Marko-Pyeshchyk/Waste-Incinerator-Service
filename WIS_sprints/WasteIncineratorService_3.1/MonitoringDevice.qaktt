@@ -1,0 +1,55 @@
+System wis
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Dispatch burn_end:burn_end(X)
+Dispatch burn_start:burn_start(X)
+
+Event sonardata:sonardata(K)
+
+
+Context ctx_wis ip [ host="localhost" port=8088 ]
+Context ctx_md ip [ host="127.0.0.1" port=8099 ]
+
+QActor wis context ctx_wis{
+	State s0 initial{
+		println("START wis") color blue
+		forward monitoring_device -m burn_end:burn_end(X)
+		forward monitoring_device -m burn_start:burn_start(X)
+	}
+}
+
+QActor monitoring_device context ctx_md{
+	State s0 initial{
+		println("START MonitoringDevice") color red
+		forward wis -m sonar_value:sonar_value(K)
+		forward led -m led_on:led_on(N)
+		forward led -m led_off:led_off(N)
+		forward led -m led_flashing:led_flashing(N)
+	}
+}
+
+QActor led context ctx_md{
+	State s0 initial{
+		println("START led") color magenta
+	}
+}
+
+QActor sonar context ctx_md{
+	State s0 initial{
+		println("START sonar") color green
+		forward monitoring_device -m sonar_value:sonar_value(K)
+		subscribeTo sonar_device for sonardata
+	}
+}
+
+QActor sonar_device context ctx_md{
+	State s0 initial{
+		println("START sonar_device") color yellow
+		emitlocalstream sonardata:sonardata(K)
+	}
+}

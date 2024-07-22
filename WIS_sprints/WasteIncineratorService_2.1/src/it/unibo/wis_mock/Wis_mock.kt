@@ -24,30 +24,10 @@ class Wis_mock ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name		START")
 						subscribeToLocalActor("incinerator") 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t15",targetState="ready",cond=whenDispatch("activation_command"))
-				}	 
-				state("ready") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name		READY to guide the robot")
 						forward("burn_start", "burn_start(N)" ,"incinerator" ) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t16",targetState="retrieve_ash",cond=whenEvent("burn_end"))
-				}	 
-				state("retrieve_ash") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name		robot will retrieve ash")
 						forward("ash_taken", "ash_taken(N)" ,"incinerator" ) 
+						forward("kg", "kg(N)" ,"waste_storage" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

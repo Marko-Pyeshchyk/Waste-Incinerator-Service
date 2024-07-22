@@ -87,6 +87,7 @@ QActor test_observer context ctxwis {
 	
 	State send_data {
 		replyTo test_data with send_data:send_data($A)
+		println("END????") color cyan
 		[# System.exit(0) #]
 	}
 }

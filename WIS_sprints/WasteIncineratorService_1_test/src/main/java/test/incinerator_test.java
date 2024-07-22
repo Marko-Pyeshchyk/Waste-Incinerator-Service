@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,6 +27,8 @@ import unibo.basicomm23.utils.ConnectionFactory;
  */
 public class incinerator_test {
 private static Interaction connSupport;
+private static Interaction connSupport2;
+private static Process p;
 
 /*
  * Utilty to show the output of a process activated with Runtime.getRuntime().exec
@@ -55,6 +58,7 @@ public static void showOutput(Process proc, String color){
  *  using gradle
  */
 public static void activateSystemUsingGradle() { 
+	p.destroy();
 	Thread th = new Thread(){
 		public void run(){
 			try {
@@ -78,7 +82,7 @@ public static void activateSystemUsingDeploy() {
 		public void run(){
 			try {
 				CommUtils.outmagenta("TestPingPong24SingleCtx activateSystemUsingDeploy ");
-				Process p = Runtime.getRuntime().exec("./build/distributions/wis24_test_incinerator-1.0/bin/wis24_test_incinerator.bat");
+				p = Runtime.getRuntime().exec("./build/distributions/wis24_test_incinerator-1.0/bin/wis24_test_incinerator.bat");
 				showOutput(p,ColorsOut.BLACK);
 			} catch ( Exception e) {
 				CommUtils.outred("TestPingPong24SingleCtx activate ERROR " + e.getMessage());
@@ -91,8 +95,8 @@ public static void activateSystemUsingDeploy() {
 /*
  * Before all the tests
  */
-	@BeforeClass
-	public static void activate() {
+	@Before
+	public void activate() {
 		CommUtils.outmagenta("TestPingPong24SingleCtx activate ");
 		//activateSystemUsingGradle();
 		activateSystemUsingDeploy();
@@ -101,8 +105,14 @@ public static void activateSystemUsingDeploy() {
  * After each test	
  */
 	@After
-	public void down() { 
-		CommUtils.outcyan("end of test ");
+	public void down() throws InterruptedException { 
+		if (p != null) {
+			Thread.sleep(2000);
+            p.destroy();
+            p.waitFor();
+            Thread.sleep(2000);
+            CommUtils.outcyan("end of test ");
+        }	
 	}
 
 /*
@@ -124,6 +134,27 @@ public static void activateSystemUsingDeploy() {
 			IApplMessage reply = connSupport.request(req);
 			CommUtils.outcyan("testPingPongSystem reply="+reply);
 			String answer = reply.msgContent();
+			assertEquals(answer, "send_data(done)");
+		} catch (Exception e) {
+			CommUtils.outred("testPingPong ERROR " + e.getMessage());
+			fail("testRequest " + e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testPingPongSystem2() {
+		IApplMessage req2  = CommUtils.buildRequest( "tester", "test_data", "test_data(X)", "test_observer");
+ 		try {
+  			 CommUtils.outmagenta("testPingPongSystem ======================================= ");
+			while( connSupport2 == null ) {
+ 				connSupport2 = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8080");
+ 				CommUtils.outcyan("testPingPongSystem another connect attempt ");
+ 				Thread.sleep(1000);
+ 			}
+ 			CommUtils.outcyan("CONNECTED to pingobserver " + connSupport2);
+			IApplMessage reply2 = connSupport2.request(req2);
+			CommUtils.outcyan("testPingPongSystem reply="+reply2);
+			String answer = reply2.msgContent();
 			assertEquals(answer, "send_data(done)");
 		} catch (Exception e) {
 			CommUtils.outred("testPingPong ERROR " + e.getMessage());

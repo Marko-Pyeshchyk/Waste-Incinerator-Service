@@ -269,34 +269,45 @@ div.imagedesc{
 
 <h2>Problem analysis</h2>
 <div class="remark">
-	GOAL: WasteStorage
+	GOAL: gestione degli RP in input al sistema 
 	<br><br>
 	<h3>WasteStorage</h3>
-	ENTITA del sistema, responsabile della gestione dei RP/Kg e della comunicazione del loro quantitativo:
-	<code>Dispatch rp_number:rp_number(N)</code><br><br>
-	Per il principio di responsabilità minima l'informazione deve essere comunicata a WIS, ordinatore del sistema che riceve le informazioni del numero di RP per decidere l'operatività del OpRobot.
-	Nel caso di funzionamento generico del sistema, ogni volta che WIS ha bisogno di sapere il numero di RP lo puo ricavare da WasteStorage.
+	WIS è un attore che deve conoscere il numero di RP per decidere l'operatività del OpRobot e tenere aggiornato lo della GUI.
+	Poiché il sistema dispone di una bilancia che rileva i Kg, ma non il numero esatto di RP, è necessario che i dati vengano interpretati e comunicati a WIS.
+	Per il principio di responsabilità minima WasteStorage si occupa solo della gestione di RP e della comunicaazione del loro quantitativo a WIS.
+	Deve inoltre ricevere da un agente esterno nuovi RP sotto forma di Kg. <br><br>
+
+	Per l'implementazione ci sono due possibilità:
+	<li>WIS richiede il numero di RP quando ne necessita</li> 
+	<li>WasteStorage comunica a WIS ogni variazione di RP</li>
+
+	Partendo dalla prima possibilità, nel caso di funzionamento generico del sistema, ogni volta che WIS ha bisogno di sapere il numero di RP lo puo chiedere a WasteStorage.
 	Nasce però un problema quando sono rilevati esattamente 0 RP, in questo caso o WIS fa polling oppure WasteStorage si rende osservabile dal coordinatore.
-	<br>
 	L'ultima opzione è migliore in quanto genera un traffico ridotto nella rete
-	<br>
-	Su quanto appena detto WasteStorage puo essere implementato come POJO o attore QAK.
+	<br><br>
+	Su quanto appena detto WasteStorage puo essere implementato come POJO o attore QAK. <br>
 	L'implementazione tramite attore semplifica la realizzazione e la gestione delle comunicazioni.
 	<br><br>
-	<h3>Scale</h3>
-	Dispositivo per la rilevazione del peso dei RP comunicati a WasteStorage. <br>
-	<br>
-	La bilancia viene considerata come una fonte di informazioni autonoma. Non avendo però a disposizione una bilancia fisica, è necessario realizzarla.
-	Potrebbe essere anche una semplice variabile gestita da WasteStorage ma è piu opportuno realizzare un attore QAK per l'eventualità futura di una bilancia fisica: scale_device.
-	Ha il compito di:
-	<li>aumentare il peso rilevato quando un attore ESTERNO immette nel sistema un RP</li>
-	<li>diminuire il peso rilevato quando il OpRobot toglie un RP dal WasteStorage</li>
-	Per la comunicazione servono quidni 3 messaggi: <br>
-	<code>Dispatch add_weight:add_weight(N)</code> da ESTERNO<br>
-	<code>Dispatch remove_weight:remove_weight(N)</code> da WasteStorage<br>
-	<code>Dispatch weight:weight(N)</code> a WasteStorage<br>
+	Per la seconda possibilità, ogni volta che vengono immessi nel sistema RP o il robot ne toglie uno, WIS verrà aggiornato da WasteStorage.
+	In questo modo non c'è piu il problema de 0 RP presenti, quindi è l'opzione migliore.
 	<br><br>
+	WasteStorage quindi è un attore e i messaggi sono modellati come: <br><code>Dispatch rp_number:rp_number(N)</code><br><code>Dispatch kg:kg(N)</code><br><br>
+
+	<h3>Scale (mock)</h3>
+	Dispositivo per la rilevazione del peso dei RP comunicati a WasteStorage. <br>
+	La bilancia viene considerata come una fonte di informazioni autonoma. Non avendo però a disposizione una bilancia fisica, è necessario realizzarla.
+	Data la sua semplicità puo essere una semplice variabile all'interno di WasteStorage.
 	
+	<br><br>
+	<h3>Agente esterno</h3>
+	Per il funzionamento del sistema l'agente esterno porta dei RP in input e la bilancia dovrebbe rilevare un peso.
+	Poichè la bilancia è simulata come variabile, l'agente esterno manda un messaggio direttamente a WasteStorage. 
+	<br><code>Dispatch kg:kg(N)</code>
+	<br>
+	Ma, dato che il focus principale del sistema sono gli RP, il peso è un informazione "momentanea". Quindi WasteStorage puo ricevere dall'agente esterno il peso e convertirlo direttamente in numero di RP, rendento la variabile peso superflua.
+	<br>Ad esempio: se riceve 98Kg o 102Kg questi devono essere considerati come 2 RP. 
+	<br>
+	In questo caso l'agente esterno viene sviluppato come mock per il corretto funzionamento del sistema.
 
 
 	<h3>Architettura logica</h3>
@@ -305,7 +316,7 @@ div.imagedesc{
 
 <h2>Test plans</h2> 
 <div class="remark"> 
-	Verificare che, quando viene tolto un RP dal OpRobot, WIS venga notificato correttamente.
+	Inserire nel sistema dal agente esterno 47Kg e verificare che WIS riceva l'informazione di 1 RP. Inserire altri 152 Kg e verificare che WIS percepisce in totale 4 RP.
 </div>
 
 <h2>Project</h2> 
@@ -313,16 +324,17 @@ div.imagedesc{
 	<a href="../src/TemaFinale24.qak">Progetto</a><br><br>
 	Due attori principali:
 	<br>
-	<li>waste_storage ha il compito di comunicare il peso a WIS</li>
-	<li>scale_device gli fornisce queste informazioni già filtrate; tiene conto di due pesi (last e new) e manda informazioni a waste_storage solamente se la differenza di questi è sostanziale ( maggiore di THRESHOLD ) </li>
-	Questo viene fatto per motivi di efficienza, riducendo così il traffico.
+	<li>external agent genera gli RP e li comunica sotto forma di Kg a waste_storage </li>
+	<li>waste_storage converte i Kg in RP e li comunica a WIS; quest'ultimo, quando comanderà il robot, per togliere 1 RP da waste_storage li manderà un messaggio di kg(-50) sfruttando così lo stato che già esiste per convertire i Kg in RP</li>
+
+
 	
 	
 </div>
 
 <h2>Testing</h2> 
 <div class="remark">
-
+	il test descritto di sopra si trova <a href="../../WasteIncineratorService_2.1_test/src/main/java/test/ws_test.java">qui</a>.
 </div>
 
 <h2>Deployment</h2> 
