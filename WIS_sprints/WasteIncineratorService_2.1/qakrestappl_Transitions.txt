@@ -1,2 +1,8 @@
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"ready", "msgId":"activation_command"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"s0", "nextstate":"convert_kg", "msgId":"kg"}
+{"actor":"waste_storage", "msgType":"dispatch", "curstate":"convert_kg", "nextstate":"convert_kg", "msgId":"kg"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"activated", "msgId":"activation_command"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"ready", "nextstate":"burning", "msgId":"burn_start"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"burning", "nextstate":"ready", "msgId":"ash_taken"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"s0", "nextstate":"ready", "msgId":"activation_command"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"retrieve_ash", "nextstate":"update_rp", "msgId":"rp_number"}
+{"actor":"wis_mock", "msgType":"dispatch", "curstate":"update_rp", "nextstate":"update_rp", "msgId":"rp_number"}

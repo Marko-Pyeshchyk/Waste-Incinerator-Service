@@ -24,7 +24,6 @@ class Activator_mock ( name: String, scope: CoroutineScope, isconfined: Boolean=
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						forward("activation_command", "activation_command(0)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

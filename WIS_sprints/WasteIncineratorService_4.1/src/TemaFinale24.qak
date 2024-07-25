@@ -148,6 +148,7 @@ QActor op_robot  context ctxwis {
 	State menage_ash3 {
 		forward wis_mock -m work:work(dumping_ash)
 		delay 1000
+		forward wis_mock -m work:work(job_done)
 	}
 	Goto ready
 	

@@ -21,13 +21,59 @@ class Wis_mock ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 var RP:Int = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						CommUtils.outgreen("$name		START")
 						subscribeToLocalActor("incinerator") 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t15",targetState="ready",cond=whenDispatch("activation_command"))
+				}	 
+				state("ready") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name		READY to guide the robot")
 						forward("burn_start", "burn_start(N)" ,"incinerator" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t16",targetState="retrieve_ash",cond=whenEvent("burn_end"))
+				}	 
+				state("retrieve_ash") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name		robot will retrieve ash")
 						forward("ash_taken", "ash_taken(N)" ,"incinerator" ) 
-						forward("kg", "kg(N)" ,"waste_storage" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t17",targetState="update_rp",cond=whenDispatch("rp_number"))
+				}	 
+				state("update_rp") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("rp_number(N)"), Term.createTerm("rp_number(N)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 RP = payloadArg(0).toInt()  
+								CommUtils.outgreen("$name		number of RP in the system: $RP")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t18",targetState="update_rp",cond=whenDispatch("rp_number"))
+				}	 
+				state("remove_rp") { //this:State
+					action { //it:State
+						 var R = -50  
+						forward("kg", "kg($R)" ,"waste_storage" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

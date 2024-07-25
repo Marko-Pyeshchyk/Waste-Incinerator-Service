@@ -1,0 +1,178 @@
+System wis24_test_incinerator
+
+Event burn_end : burn_end(N)
+
+// incinerator
+Dispatch activation_command:activation_command(N)
+Dispatch burn_start:burn_start(N)
+Dispatch ash_taken:ash_taken(N)
+
+//TESTING
+Dispatch event_sent:event_sent(X)
+Request test_data:test_data(X)
+Reply send_data:send_data(X) for test_data
+
+Dispatch state:state(X)
+
+Request burnRP:burnRP(X)
+Reply burnRP:burnRP(X) for burnRP
+Dispatch answer_wait:answer_wait(X)
+
+
+Request extraRP:extraRP(X)
+Reply extraRP:extraRP(x) for extraRP
+Dispatch multiple:multiple(X)
+
+
+Context ctxwis  ip [host="localhost" port=8080] 
+
+
+QActor incinerator  context ctxwis {    
+	[# var BTIME = 2000L #]
+	State s0 initial {
+		println("$name	START") color red
+		delay 2000
+		updateResource [#"state(off)"#]
+	} 
+	Transition t1 whenMsg activation_command -> activated
+		
+	State activated {
+		forward wis_mock -m activation_command:activation_command(N)
+	}
+	Goto ready
+	
+	State ready {
+		updateResource [#"state(on)"#]
+		println("$name	READY") color red
+	}
+	Transition t1 whenMsg burn_start -> burning
+	
+	State burning {
+		updateResource [#"state(burning)"#]
+		println("$name	burning") color red
+		delayVar BTIME
+		emit burn_end:burn_end(0) 
+		updateResource [#"state(ended)"#]
+	}
+	Transition t1 whenMsg ash_taken -> ready
+	
+}
+
+QActor wis_mock context ctxwis {
+	State s0 initial {
+		println("$name		START") color green
+		delay 500
+		subscribeTo incinerator for burn_end
+	} 
+	Transition t1 whenMsg activation_command -> ready
+		
+	State ready {
+		println("$name		READY to guide the robot") color green
+		// fare il movimento del robot
+		forward incinerator -m burn_start:burn_start(N)
+	}
+	Transition t1 whenEvent burn_end -> retrieve_ash
+	
+	State retrieve_ash {
+		println("$name		robot will retrieve ash") color green
+		forward incinerator -m ash_taken:ash_taken(N)
+		updateResource [#"event_sent(done)"#]
+	}
+}
+
+QActor activator_mock context ctxwis {
+	State s0 initial {
+		delay 5000
+		forward incinerator -m activation_command:activation_command(N)
+	}
+}
+
+QActor test_observer context ctxwis {
+	[# 
+		var Status="" 
+	    var Last="on"
+	    var Value=0
+	    var Cycles=0
+	#]
+	State s0 initial{
+		delay 1000
+		observeResource wis_mock msgid event_sent
+		observeResource incinerator msgid state
+	}
+	Transition t0 whenRequest test_data -> handle_data
+	              whenRequest burnRP -> handle_burn
+	              whenRequest extraRP -> handle_extra
+	              whenInterrupt state -> update_status
+	              
+	//MultipleRP test
+	State handle_extra{
+		delay 7000
+		forward incinerator -m burn_start:burn_start(0)
+		forward incinerator -m burn_start:burn_start(0)
+	}
+	Transition t0 whenMsg state -> handle_multiple
+	
+	State handle_multiple{
+		onMsg(state:state(X)){
+			[# Status= payloadArg(0) #]
+			println("STATUS:	$Status	LAST:	$Last	VALUE:	$Value	CYCLES:	$Cycles")color cyan
+			if [# Status=="burning" && Last=="on"#]{
+				[#
+					Value++
+				#]
+			} else{
+				if [# Status=="on" && Last=="ended"#]{
+				[#
+					Cycles++
+				#]
+				} else {
+					if [# Status=="ended" && Last=="burning"#]{
+						if [# Cycles>0 && Cycles==(Value-1) #]{
+							replyTo extraRP with extraRP:extraRP($Cycles)
+							[#System.exit(0)#]
+						}
+					}
+				}
+			}
+			[#Last=Status#]
+		}
+	}
+	Transition t0 whenMsg state -> handle_multiple
+
+	
+	//Activation test     
+	State handle_burn{
+		forward incinerator -m burn_start:burn_start(0)
+		delay 1000
+		autodispatch answer_wait:answer_wait(0)
+	}
+	Transition t0 whenMsg answer_wait -> handle_answer
+				  whenInterrupt state -> update_status
+	
+	State handle_answer{
+		println("STATUS:	$Status")
+		replyTo burnRP with burnRP:burnRP($Status)
+		[#System.exit(0)#]
+	}
+	
+	//Sytstem test
+	State handle_sent{
+	}
+	Transition t0 whenMsg event_sent -> handle_data
+	
+	State handle_data{
+		replyTo test_data with send_data:send_data(done)
+		[#System.exit(0)#]
+	}
+	
+	//utility
+	State update_status{
+		onMsg(state:state(X)){
+			[# 
+				Last=Status
+				Status= payloadArg(0) 
+			#]
+		}
+		returnFromInterrupt
+	}
+}

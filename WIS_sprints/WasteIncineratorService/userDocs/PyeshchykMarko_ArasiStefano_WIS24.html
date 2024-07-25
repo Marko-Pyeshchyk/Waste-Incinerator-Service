@@ -206,7 +206,7 @@ div.imagedesc{
 
 
    
-<title>WIS</title></head>
+<title>SPRINT0</title></head>
     
 <!--
 	<body onload="loadNav();">
@@ -234,7 +234,7 @@ div.imagedesc{
 -->
 <body>
 <div id="top">
-<h1>WIS<font size="5"></font> </h1>
+<h1>SPRINT0<font size="5"></font> </h1>
 </div>  
 
 <div class="body"> 
@@ -251,67 +251,99 @@ div.imagedesc{
  
 <h2>Requirement analysis</h2>
 <div class="remark">
-    <h3>Service Area</h3>
+	<h3>WIS</h3>
+    Entità attiva che funge quindi da coordinatore del sistema per comandare il OpRobot.
+	
+	WIS deve essere sempre attivo e capace di scambiare messaggi, per mantenere lo stato del sistema e di conseguenza comandare il OpRobot.
+
+	<br>
+	Per fare ciò deve conoscere le informazioni degli altre entità come:
+	<li>numero degli RP presenti in WasteStorage</li>
+	<li>distanza rilevata del sonar in AshOut</li>
+	<li>stato dell'Incinerator (se brucia o meno)</li>
+	<li>stato del robot (posizione e lavoro corrente)</li>
+
+	<br>
+	WIS ha quindi tutte le responsabilità di gestire lo stato del sistema, mentre tutte le altre entità hanno la responsabilità di eseguire comandi o fornire informazioni.
+	Perciò WIS deve essere un attore.
+
+	<h3>Service Area</h3>
     Spazio rettangolare che puo essere descritto come <a href="./html/RobotCleaner.html?highlight=requisiti#rc24-analisi-dei-requisiti">spazio euclideo delimitato da bordi</a>. <br>
-    La mappa quindi puo essere descritta come matrice bidimensionale map[C,R] a "misura del robot": partendo da DR, la matrice ha R rige C e colonne. <br> 
+    La stanza viene rappresentata da una griglia di quadrati, dove ogni quadrato ha come lato il diametro della circonferenza che circoscrive il robot DR.<br>
+	Quindi presupponendo di avere R=4 righe e C=6 colonne possiamo definire lu=ld=DR*C e lf=lr=RC*R. <br>
+	Perciò la stanza verrà rappresentata da una matrice rettangolare map[R,C] in cui map[0,0] rappresenta il quadrato in alto a sinistra.<br> La stanza contiene C*R quadrati.
     <br>
     Su questo piano sono posizionate tutte le entità, in particolare tutte le porte rappresentano coordinate dove il robot si deve dirigere per svolgere le proprie mansioni:
     <li>HOME: punto di partenza del robot puo essere definita da map[0,0]</li>
-    <li>WASTEIN port: punto di accesso del WasteStorage puo essere definita da map[C,0]</li>
-    <li>ASHOUT port: punto di accesso del AshStorage puo essere definita da map[C,R]</li>
+    <li>WASTEIN port: punto di accesso del WasteStorage è posizionato su ld nel lato superiore di map[R+1,0]</li>
+    <li>ASHOUT port: punto di accesso del AshStorage è posizionato su ld nel lato superiore di map[R+1,C]</li>
+	<li>Incinerator: definito da 4 celle, ovvero map[1,4], map[1,5], map[2,4] e map[2,5]</li>
+	<li>ostacolo: posizionato in map[3,2]</li>
+	<li>BURNIN port: posizionata sul lato sinistro di Incinerator nelle celle map[1,4] e map[2,4]</li>
+    <li>ASHOUT port: posizionata sul lato inferiore di Incinerator nelle celle map[2,4] e map[2,5]</li>
  
-	<br>
-	<h3>WIS  (Attore)</h3>
-    Entità attiva che funge quindi da coordinatore del sistema visto per comandare il OpRobot: <code>Dispatch robot_move:robot_move(X)</code>. Per fare ciò deve conoscere anche le informazioni degli altri attori.
-    <br>
-    Gli è necessario sapere il peso degli RP per capire quando rendere operativo il OpRobot: <code>Dispatch weight:weight(X)</code>.
-	<br><br>
-	Per tale scopo WasteStorage deve utilizzare la bilancia e non è stato definito un metodo di comunicazione.
-	<br>
-	<br>WasteStorage  (Attore): container di RP, deve essere in grado di inviare informazioni riguardanti il suo stato.
-	Per il sistema la parte fondamentale è la bilancia (fornita dal committente), ovvero una fonte di informazioni autonoma con cui WasteStorage deve interfacciarsi per rilevare il numero di RP presenti.
-	Non è stato definito un metodo di comunicazione con Scale. <br>
-	Il numero di RP deve essere acessibile alla GUI. 
 
-
-	<br><br><h3>MonitoringDevice (Attore)</h3> 
-    Composto da un RaspberryPi che gestisce un Sonar e un Led (forniti dal committente). Deve inviare al sistema lo stato di AshStorage: <code>Dispatch sonar_value:sonar_value(K)</code>.<br><br>
-    Sonar e Led in quanto collegati ad un RaspberryPI sono possibili da considerare in un contesto diverso dal resto del sistema.<br>
-    MonitoringDevice in quanto coordinatore farà anch'esso parte di questo contesto.
-	<br><br> Sonar (Attore) si occupa della misurazione della distanza tra se stesso e la pila di cenere nell'AshStorage.
-	Per questo scopo si interfaccia con un sonar fisico (SONAR HC-SR04) che gli manda le distanze rilevate. <br>
-	L'informazione di 3-4 RP che AshStorage può contenere è superflua perche è stato già dato il limite DLIMIT al sonar. <br>
-	Sonar, inoltre, deve essere in grado di inviare informazioni riguardanti il suo stato alla GUI e al sistema. Non è stato definito un metodo di comunicazione.
-	<br><br>Il Led (Attore) deve accendersi/spegnersi o lampeggiare in base allo stato del sistema. Anche qusto si interfaccia con il led fisico.
-
-
-	<br><br><h3>Incinerator  (Attore)</h3>
-	Luogo fisico definito nella Service Area di coordinate map[X,Y]:
-    <li>porta BURNIN di coordinate map[X-1,Y]</li>
-    <li>porta BORNOUT di coordinate map[X,Y+1]</li>
-	In questo caso le coordinate di Incinerator sono [4,2].
-	<br><br>
-	Un <code>Dispatch activation_command:activation_command</code> viene mandato da parte di un agente esterno al sistema per far partire l'Incinerator.
-	Dopo l'inizio dell'incenerimento passano BTIME secondi e <code>Event burn_end:burn_end(N)</code> viene comunicato dal Incinerator (fine dell'incenerimento). <br>
-    L'Incinerator non deve bruciare RP se non è stato attivato. <br><br>
+	<h3>OpRobot</h3>
+	 Sappiamo che il OpRobot è un DDR robot<a href="./html//BasicRobot24.html">fornito dal committente</a>.
+	 Quindi si puo sfruttare il BasicRobot24 per interfacciarsi e comandarlo (ad esempio tramite  <code>Request step:step(X)</code> o <code>Request robot_move:robot_move(X)</code>): per questo potrebbe essere considerato un POJO oppure un Attore.
 	
- 	Per caricare un nuovo RP la cenere deve essere svuotata. Non è definito il modo con cui l'inceneritore riceva l'informazione che la cenere è stata svuotata.
+	 <br>
+	 Deve essere in grado di ricevere l'evento <code>Event burn_end:burn_end(X)</code>.
 	
-	<br><br><h3>OpRobot (Attore)</h3>
-	 Sappiamo che il OpRobot è un <a href="https://www.youtube.com/watch?v=aE7RQNhwnPQ">DDR robot</a> fornito dal committente.
-	 Quindi si puo sfruttare il <a href="./html//BasicRobot24.html">BasicRobot24</a> per interfacciarsi, 
-	 rendendolo uno degli attori principali del sistema.
- 
-	 <br><br>
-	 Deve ricevere informazioni riguardanti WasteStorage, AshStorage e Incinerator per capire quando essere operativo.
-	 Al momento non è possibile definire la tipologia dei messaggi.
- 
 	 <br><br>
 	 Ha la responsabilità di portare un RP per volta alla porta BURNIN.
 	 Il robot deve aspettare in HOME e dare priorità a svuotare la cenere dal Incinerator rispetto a gestire un nuovo RP.
-	 Deve recarsi quindi alla porta BURNOUT dopo aver ricevuto l'evento dall'inceneritore (burn_end).
+	 Deve recarsi quindi alla porta BURNOUT dopo aver ricevuto l'evento dall'inceneritore (<code>Event burn_end:burn_end(X)</code>).<br><br>
 
-	 <br><br><h3>Agenti esterni</h3>
+	 OpRobot per eseguire i propri compiti dovrà recarsi in una cella libera confinante a ciascuna porta.<br>
+	 Ad esempio per andare a prendere a WASTEIN il robot dovrà recarsi in map[4,0].<br><br>
+
+	 L'OpRobot verrà sviluppato come un attore in quanto deve essere capace di ricevere i comandi da WIS e l'evento da Incinerator.
+    
+	<br>
+	 
+
+	<h3>WasteStorage</h3>
+
+	
+	Container di RP, deve essere in grado di inviare informazioni riguardanti il suo stato a WIS.<br>
+	Per il sistema la parte fondamentale è la bilancia (fornita dal committente), ovvero una fonte di informazioni autonoma con cui WasteStorage deve interfacciarsi per rilevare il numero di RP presenti.
+	Non è stato definito un metodo di comunicazione con Scale. <br><br>
+	Dovendo mantenere costantemente traccia del numero di RP che contiene questo può venire modellato coome un attore.
+
+
+	<h3>MonitoringDevice</h3> 
+    Composto da un RaspberryPi che gestisce un Sonar e un Led (forniti dal committente). Deve inviare a WIS lo stato di AshStorage.<br><br>
+    Sonar e Led in quanto collegati ad un RaspberryPI sono possibili da considerare in un contesto diverso dal resto del sistema.<br>
+    MonitoringDevice in quanto coordinatore farà anch'esso parte di questo contesto.<br>
+	In maniera analoga a WIS MonitoringDevice racchide tutta la logica delle sue componenti.<br>
+	In quanto MonitoringDevice deve essere costantemente aggiornato può essere sviluppato come un attore<br>
+	<h3>Sonar</h3> 
+	Si occupa della misurazione della distanza tra se stesso e la pila di cenere nell'AshStorage.
+	Per questo scopo si interfaccia con un sonar fisico (SONAR HC-SR04) che gli manda le distanze rilevate. <br>
+	L'informazione di 3-4 RP che AshStorage può contenere è superflua perche è stato già dato il limite DLIMIT al sonar. <br>
+	<h3>Il Led</h3> Deve accendersi/spegnersi o lampeggiare in base allo stato del sistema. Anche qusto si interfaccia con il led fisico.
+
+
+	<br><br><h3>Incinerator</h3>
+	Luogo fisico definito nella Service Area, conme descritto precedentemente.
+	<br><br>
+	Un activation_command viene mandato da parte di un agente esterno al sistema per far partire l'Incinerator. Questo non deve bruciare RP se non è stato attivato.
+	<br><br>
+	Dopo l'inizio dell'incenerimento passano BTIME secondi e <code>Event burn_end:burn_end(N)</code> viene comunicato dal Incinerator (fine dell'incenerimento). <br>
+	Per questi motivi l'Incinerator è un attore. <br><br>
+
+	
+ 	Per caricare un nuovo RP la cenere deve essere svuotata.
+	Non è definito il modo con cui l'inceneritore riceva questa informazione.
+	
+	<br><br>
+	<h3>ServiceStatusGUI</h3>
+	La GUI deve essere capace di ricevere informazioni dal sistema e renderle disponibili all'esterno.<br>
+	Non sono previste interazioni con utenti esterni.<br>
+	Non è definito alcun metodo di interazione con il sistema.<br>
+
+	 <br><h3>Agenti esterni</h3>
 	 Lo sviluppo degli agenti esterni per rifornire e svuotare la WasteStorage e AshStorage non sono dei requisiti:
 	 <li>quando WasteStorage viene rifornito Scale rileverà un peso maggiore</li>
 	 <li>quanto AshStorage viene svuotato Sonar rileverà una distanza maggiore</li>
@@ -320,7 +352,7 @@ div.imagedesc{
 	 <br><br><h3>Modello dei requisiti</h3>
 	 Il sistema puo essere quindi descritto da un insieme di attori che comunicano tra loro per raggiungere uno scopo comune. Perciò il <a href="./html/QakActors24.html?#linguaggio-qak">linguaggio QAK</a> è un possibile strumento per la modellazione e sviluppo dell'allpicazione.
 	 <br> 
-	 <img src="../wis24arch_modello_requisiti.png">
+	 <img src="../../wis24arch_modello_requisiti.png">
 
 	 <br><br><h3>Priorità dei requisiti</h3>
      <ol>
@@ -335,30 +367,11 @@ div.imagedesc{
 </div>
 
 
-<h2>Problem analysis</h2>
-<div class="remark">
-
+<h2>Prossimi sviluppi</h2>
+<div>
+	Nel prossimo SPRINT si procederà ad analizzare e sviluppare Incinerator, in particolare la sua capacità di essere attivo, bruciare RP e comunicarlo ad altri.
 </div>
-
-<h2>Test plans</h2> 
-<div class="remark"> 
-</div>
-
-<h2>Project</h2> 
-<div class="remark">
-
-</div>
-
-<h2>Testing</h2> 
-<div class="remark">
-
-</div>
-
-<h2>Deployment</h2> 
-
- 
-<h2>Maintenance</h2> 
- 
+<br><br>
 <!-- USEFUL
 <table style="width:100%" border="1">
 <tr>

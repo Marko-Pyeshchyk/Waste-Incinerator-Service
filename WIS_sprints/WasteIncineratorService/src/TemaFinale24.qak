@@ -1,0 +1,43 @@
+System wis24
+
+Event burn_end : burn_end(N)
+
+Dispatch robot_move:robot_move(X)
+
+Context ctxwis  ip [host="localhost" port=8080]
+Context ctxbasicrobot ip [host="127.0.0.1"  port=8020   ]  
+Context ctxmd  ip [host="localhost" port=8040]
+Context ctxext ip [host="localhost" port=8060]
+
+ExternalQActor basicrobot context ctxbasicrobot 
+
+QActor wis context ctxwis {    
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+		forward op_robot -m robot_move:robot_move(ACTION)
+	}
+}
+
+QActor incinerator  context ctxwis {    
+	State s0 initial {
+		emit burn_end:burn_end(0) 
+	}
+}
+
+QActor op_robot context ctxwis {    
+	
+	State s0 initial {
+		subscribeTo incinerator for burn_end
+	} 
+}
+
+QActor waste_storage context ctxwis {
+	State s0 initial {
+	} 
+}
+
+QActor monitoring_device context ctxmd {    
+	State s0 initial {
+	}
+}
+

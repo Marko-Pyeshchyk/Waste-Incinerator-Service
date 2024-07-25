@@ -142,6 +142,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						forward("work", "work(dumping_ash)" ,"wis_mock" ) 
 						delay(1000) 
+						forward("work", "work(job_done)" ,"wis_mock" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

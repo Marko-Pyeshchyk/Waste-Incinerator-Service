@@ -1,0 +1,186 @@
+System monitoring_device
+// monitornig device
+
+// monitornig device
+Dispatch burn_start:burn_start(N)
+Dispatch burn_end:burn_end(X)
+
+Dispatch sonar_value:sonar_value(K)
+
+Dispatch led_on:led_on(N)
+Dispatch led_off:led_off(N)
+Dispatch led_flashing:led_flashing(N)
+
+Event sonardata:sonardata(K)
+
+Context ctxmd ip [host="localhost" port=8080] 
+Context ctxwis ip [host="192.168.1.50" port=8080]
+
+ExternalQActor wis context ctxwis 
+
+QActor monitoring_device context ctxmd{
+	[#	val DLIMIT = 15;
+		var max_dist = 0
+		var Distance = 999;
+		var burning = 0;
+	#]
+	State s0 initial{
+		println("START MonitoringDevice") color red
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+	
+	State handleStart {
+		[# burning = 1 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_on:led_on(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleEnd {
+		[# burning = 0 #]
+		if [# Distance>DLIMIT && Distance!=max_dist #] {
+			forward led -m led_off:led_off(N)
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+				  
+	State handleSonar{
+		onMsg(sonar_value:sonar_value(K)){
+			[# Distance = payloadArg(0).toInt() #]
+			println("$name			distance: $Distance") color red
+			forward wis -m sonar_value:sonar_value($Distance)
+			if [# max_dist<Distance #] {
+				[# max_dist=Distance #]
+			}
+			if [# Distance<=DLIMIT #] {
+				forward led -m led_flashing:led_flashing(N)
+			} else {
+				if [# max_dist==Distance #] {
+					forward led -m led_flashing:led_flashing(N)
+				} else {
+					if [# burning==1 #] {
+						forward led -m led_on:led_on(N)                             
+					} else {
+						forward led -m led_off:led_off(N)
+					}
+				}
+			}
+		}
+	}
+	Transition t0 whenMsg sonar_value -> handleSonar
+				  whenMsg burn_start -> handleStart
+				  whenMsg burn_end -> handleEnd
+}
+
+QActor led context ctxmd{
+	[# 
+		lateinit var process : Process
+		lateinit var out : java.io.BufferedReader
+		var blink = false
+	#]
+	
+	State s0 initial{
+		println("START led") color magenta
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+	State handleOn{
+		if [# blink == true #] {
+			[#
+				blink = false
+				process.destroy()
+			#]
+		}
+		
+		println("LED ON") color magenta
+		[# 
+			process = Runtime.getRuntime().exec("python led_on.py")
+		#]
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+	
+	State handleOff{
+		if [# blink == true #] {
+			[#
+				blink = false
+				process.destroy()
+			#]
+		}
+		
+		println("LED OFF") color magenta
+		[# 
+			process = Runtime.getRuntime().exec("python led_off.py")
+		#]
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+				  
+				  
+	State handleFlashing{
+		println("LED FLASHING") color magenta
+		if [# blink == false #] {
+			[# 
+				process = Runtime.getRuntime().exec("python led_blink.py")
+				blink = true
+			#]	
+		}
+	}
+	Transition t0 whenMsg led_on -> handleOn
+				  whenMsg led_off -> handleOff
+				  whenMsg led_flashing -> handleFlashing
+}
+
+QActor sonar context ctxmd{
+	State s0 initial{
+		println("START sonar") color green
+		delay 1000
+		subscribeTo sonar_device for sonardata
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+	
+	State handleSonar{
+		onMsg(sonardata:sonardata(K)){
+			[# var D = payloadArg(0) #]
+			forward monitoring_device -m sonar_value:sonar_value($D)
+		}
+	}
+	Transition t0 whenEvent sonardata -> handleSonar
+}
+
+QActor sonar_device context ctxmd {
+	[# 
+		lateinit var process : Process
+		lateinit var out : java.io.BufferedReader
+		var Distance = 0
+	#]
+	
+	State s0 initial {
+		println("$name	START") color yellow
+		[# 
+			process = Runtime.getRuntime().exec("python sonar.py")
+			out = process.getInputStream().bufferedReader()
+		#]
+	}
+	Goto readOut
+	
+	State readOut {
+		[# 
+			var Distance =  out.readLine()	
+		#]
+		//println("$name	distance: $Distance") color yellow
+		emitlocalstream sonardata:sonardata($Distance)
+	}
+	Goto readOut
+}

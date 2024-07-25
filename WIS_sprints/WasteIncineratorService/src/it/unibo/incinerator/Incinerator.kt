@@ -30,15 +30,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="start",cond=whenDispatch("activation_command"))
-				}	 
-				state("start") { //this:State
-					action { //it:State
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
 				}	 
 			}
 		}
