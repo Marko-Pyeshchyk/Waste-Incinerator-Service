@@ -22,3 +22,5 @@
 {"actor":"wis", "msgType":"dispatch", "curstate":"activated", "nextstate":"handle_rp_number", "msgId":"rp_number"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"activated", "nextstate":"handle_work", "msgId":"work"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"activated", "nextstate":"handle_map", "msgId":"map"}
+{"actor":"test_observer", "msgType":"dispatch", "curstate":"send_rp", "nextstate":"handle_sonar", "msgId":"sonar_value"}
+{"actor":"test_observer", "msgType":"dispatch", "curstate":"handle_sonar", "nextstate":"handle_sonar", "msgId":"sonar_value"}

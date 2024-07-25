@@ -35,12 +35,15 @@ class Waste_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				}	 
 				state("convert_kg") { //this:State
 					action { //it:State
+						delay(5000) 
 						if( checkMsgContent( Term.createTerm("kg(N)"), Term.createTerm("kg(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 
 												var KG = payloadArg(0).toFloat()
 												RP += kotlin.math.round(KG/50).toInt()
 								CommUtils.outyellow("$name	$KG Kg ===> $RP RP")
+								updateResourceRep( "rp_number($RP)"  
+								)
 								forward("rp_number", "rp_number($RP)" ,"wis" ) 
 						}
 						//genTimer( actor, state )

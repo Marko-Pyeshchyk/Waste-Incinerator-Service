@@ -206,7 +206,7 @@ div.imagedesc{
 
 
    
-<title>WIS</title></head>
+<title>SPRINT2</title></head>
     
 <!--
 	<body onload="loadNav();">
@@ -240,11 +240,12 @@ div.imagedesc{
 <div class="body"> 
 <h2>Introduction</h2>
 <div class="remark">
-	SPRINT2: progettazione e sviluppo di WasteStorage e interfaccia a Scale (P'yeshchyk).
+	SPRINT2: progettazione e sviluppo di WasteStorage e interfaccia a Scale (P'yeshchyk). <br>
+	Il goal è sviluppare WasteStorage e l'agente esterno (mock) in modo da renderlo operativo per ricevere Kg dalla bilancia e comunicare il numero di RP a WIS.
+	
 	<br><br>
-	Il punto di partenza di questo SPRINT è questa architettura iniziale di riferimento:
-	<img src="../../WasteIncineratorService_1/wis24arch_architettura_logica.png"><br>
-	svilupata nel precedente <a href="../../WasteIncineratorService_1/userDocs/PyeshchykMarko_ArasiStefano_WIS24.html">SPRINT</a>.
+	Nel precedente <a href="../../WasteIncineratorService_1.1/userDocs/PyeshchykMarko_ArasiStefano_WIS24.html">SPRINT</a> siamo giunti a questo questa architettura iniziale di riferimento:
+	<img src="../../WasteIncineratorService_1.1/wis24arch.png"><br>
 </div>
  
 <h2>Requirements</h2>
@@ -255,22 +256,25 @@ div.imagedesc{
  
 <h2>Requirement analysis</h2>
 <div class="remark">
-    <br>WasteStorage  (Attore): container di RP, deve essere in grado di inviare informazioni riguardanti il suo stato.
+	<h3>WasteStorage</h3>
+	
+	Container di RP, deve essere in grado di inviare informazioni riguardanti il suo stato a WIS.<br>
 	Per il sistema la parte fondamentale è la bilancia (fornita dal committente), ovvero una fonte di informazioni autonoma con cui WasteStorage deve interfacciarsi per rilevare il numero di RP presenti.
-	Non è stato definito un metodo di comunicazione con Scale. <br>
-	Il numero di RP deve essere acessibile alla GUI. 
-	 <br><br><h3>Agenti esterni</h3>
+	Non è stato definito un metodo di comunicazione con Scale. <br><br>
+	Dovendo mantenere costantemente traccia del numero di RP che contiene questo può venire modellato coome un attore.
+
+	 <br><h3>Agenti esterni</h3>
 	 Lo sviluppo degli agenti esterni per rifornire e svuotare la WasteStorage e AshStorage non sono dei requisiti:
 	 <li>quando WasteStorage viene rifornito Scale rileverà un peso maggiore</li>
 	 <li>quanto AshStorage viene svuotato Sonar rileverà una distanza maggiore</li>
 	 In entrambi i casi il sistema funziona autonomamente e reagisce alle modifiche.
-	 <img src="../wis24arch_modello_requisiti.png">
+
+	 <br><br><h3>Modello dei requisiti</h3>
+	 <img src="../../wis24arch_modello_requisiti.png">
 </div>
 
 <h2>Problem analysis</h2>
 <div class="remark">
-	GOAL: gestione degli RP in input al sistema 
-	<br><br>
 	<h3>WasteStorage</h3>
 	WIS è un attore che deve conoscere il numero di RP per decidere l'operatività del OpRobot e tenere aggiornato lo della GUI.
 	Poiché il sistema dispone di una bilancia che rileva i Kg, ma non il numero esatto di RP, è necessario che i dati vengano interpretati e comunicati a WIS.
@@ -293,7 +297,7 @@ div.imagedesc{
 	<br><br>
 	WasteStorage quindi è un attore e i messaggi sono modellati come: <br><code>Dispatch rp_number:rp_number(N)</code><br><code>Dispatch kg:kg(N)</code><br><br>
 
-	<h3>Scale (mock)</h3>
+	<h3>Scale</h3>
 	Dispositivo per la rilevazione del peso dei RP comunicati a WasteStorage. <br>
 	La bilancia viene considerata come una fonte di informazioni autonoma. Non avendo però a disposizione una bilancia fisica, è necessario realizzarla.
 	Data la sua semplicità puo essere una semplice variabile all'interno di WasteStorage.
@@ -301,11 +305,13 @@ div.imagedesc{
 	<br><br>
 	<h3>Agente esterno</h3>
 	Per il funzionamento del sistema l'agente esterno porta dei RP in input e la bilancia dovrebbe rilevare un peso.
-	Poichè la bilancia è simulata come variabile, l'agente esterno manda un messaggio direttamente a WasteStorage.
+	Poichè la bilancia è simulata come variabile, l'agente esterno manda un messaggio direttamente a WasteStorage. 
 	<br><code>Dispatch kg:kg(N)</code>
 	<br>
 	Ma, dato che il focus principale del sistema sono gli RP, il peso è un informazione "momentanea". Quindi WasteStorage puo ricevere dall'agente esterno il peso e convertirlo direttamente in numero di RP, rendento la variabile peso superflua.
 	<br>Ad esempio: se riceve 98Kg o 102Kg questi devono essere considerati come 2 RP. 
+	<br>
+	In questo caso l'agente esterno viene sviluppato come mock per il corretto funzionamento del sistema.
 
 
 	<h3>Architettura logica</h3>
@@ -314,7 +320,7 @@ div.imagedesc{
 
 <h2>Test plans</h2> 
 <div class="remark"> 
-	Inserire nel sistema dal agente esterno 102Kg e verificare che WIS riceva l'informazione di 2 RP.
+	Inserire nel sistema dal agente esterno 47Kg e verificare che WIS riceva l'informazione di 1 RP. Inserire altri 152 Kg e verificare che WIS percepisce in totale 4 RP.
 </div>
 
 <h2>Project</h2> 
@@ -322,23 +328,28 @@ div.imagedesc{
 	<a href="../src/TemaFinale24.qak">Progetto</a><br><br>
 	Due attori principali:
 	<br>
-	<li>waste_storage ha il compito di comunicare il peso a WIS</li>
-	<li>scale_device gli fornisce queste informazioni già filtrate; tiene conto di due pesi (last e new) e manda informazioni a waste_storage solamente se la differenza di questi è sostanziale ( maggiore di THRESHOLD ) </li>
-	Questo viene fatto per motivi di efficienza, riducendo così il traffico.
+	<li>external agent genera gli RP e li comunica sotto forma di Kg a waste_storage </li>
+	<li>waste_storage converte i Kg in RP e li comunica a WIS; quest'ultimo, quando comanderà il robot, per togliere 1 RP da waste_storage li manderà un messaggio di kg(-50) sfruttando così lo stato che già esiste per convertire i Kg in RP</li>
+
+
 	
 	
 </div>
 
 <h2>Testing</h2> 
 <div class="remark">
-
+	Il test descritto di sopra si trova <a href="../../WasteIncineratorService_2.1_test/src/main/java/test/ws_test.java">qui</a>.
 </div>
 
 <h2>Deployment</h2> 
 
  
 <h2>Maintenance</h2> 
- 
+<h2>Prossimi sviluppi</h2>
+<div class="remark">
+	Nel prossimo SPRINT si procederà ad analizzare e sviluppare MonitoringDevice insieme a led e sonar. Lo scopo sarà di gestire il led in base allo stato del sistema e ricevere output del sonar.
+</div>
+ <br><br>
 <!-- USEFUL
 <table style="width:100%" border="1">
 <tr>
@@ -349,15 +360,14 @@ div.imagedesc{
 </table>
 -->
 	      	
-<br/><br/> 	
-</div>  
+
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-    By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
+	By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
 	<img src="../../../img/marko.jpg" alt="mbot" width="15%" height="15%"><br>
 	And Arasi Stefano, mat: 0001103134, email: arasi.stefano@studio.unibo.it
 	<img src="../../../img/stefano.jpg" alt="mbot" width="15%" height="15%"><br>
-GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
+GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git" style="color: #90ee90;">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
 </div>
 </body>
 </html>

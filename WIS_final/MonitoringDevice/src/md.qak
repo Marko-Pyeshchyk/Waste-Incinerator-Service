@@ -54,6 +54,7 @@ QActor monitoring_device context ctxmd{
 	State handleSonar{
 		onMsg(sonar_value:sonar_value(K)){
 			[# Distance = payloadArg(0).toInt() #]
+			updateResource[# "sonar_value($Distance)" #]
 			println("$name			distance: $Distance") color red
 			forward wis -m sonar_value:sonar_value($Distance)
 			if [# max_dist<Distance #] {

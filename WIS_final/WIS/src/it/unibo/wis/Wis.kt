@@ -63,7 +63,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("sonar_value(K)"), Term.createTerm("sonar_value(K)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 distance=payloadArg(0).toInt()  
+								 distance=payloadArg(0).toInt() 
+												var DDD=distance
+								forward("sonar_value", "sonar_value($DDD)" ,"test_observer" ) 
 						}
 						//genTimer( actor, state )
 					}
@@ -119,9 +121,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("activated") { //this:State
 					action { //it:State
-						updateResourceRep( "$name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available"  
+						updateResourceRep( "data($name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available)"  
 						)
-						CommUtils.outgreen("$name	INFO:	rp_number: $rp_number	distance: $distance	incinerator: $incinerator		robot: $robot	ash: $ash_available")
 						if(  rp_number>0 && distance>DLIMIT && incinerator!="burning" && (robot=="waiting_home" || robot=="job_done") && robot_sent==0 && ash_available==0  
 						 ){forward("take_RP", "take_RP(X)" ,"op_robot" ) 
 						 robot_sent=1  

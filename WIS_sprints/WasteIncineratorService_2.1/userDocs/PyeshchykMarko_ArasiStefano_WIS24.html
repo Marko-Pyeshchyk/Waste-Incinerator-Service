@@ -240,7 +240,9 @@ div.imagedesc{
 <div class="body"> 
 <h2>Introduction</h2>
 <div class="remark">
-	SPRINT2: progettazione e sviluppo di WasteStorage e interfaccia a Scale (P'yeshchyk).
+	SPRINT2: progettazione e sviluppo di WasteStorage e interfaccia a Scale (P'yeshchyk). <br>
+	Il goal è sviluppare WasteStorage e l'agente esterno (mock) in modo da renderlo operativo per ricevere Kg dalla bilancia e comunicare il numero di RP a WIS.
+	
 	<br><br>
 	Nel precedente <a href="../../WasteIncineratorService_1.1/userDocs/PyeshchykMarko_ArasiStefano_WIS24.html">SPRINT</a> siamo giunti a questo questa architettura iniziale di riferimento:
 	<img src="../../WasteIncineratorService_1.1/wis24arch.png"><br>
@@ -273,8 +275,6 @@ div.imagedesc{
 
 <h2>Problem analysis</h2>
 <div class="remark">
-	GOAL: gestione degli RP in input al sistema 
-	<br><br>
 	<h3>WasteStorage</h3>
 	WIS è un attore che deve conoscere il numero di RP per decidere l'operatività del OpRobot e tenere aggiornato lo della GUI.
 	Poiché il sistema dispone di una bilancia che rileva i Kg, ma non il numero esatto di RP, è necessario che i dati vengano interpretati e comunicati a WIS.
@@ -297,7 +297,7 @@ div.imagedesc{
 	<br><br>
 	WasteStorage quindi è un attore e i messaggi sono modellati come: <br><code>Dispatch rp_number:rp_number(N)</code><br><code>Dispatch kg:kg(N)</code><br><br>
 
-	<h3>Scale (mock)</h3>
+	<h3>Scale</h3>
 	Dispositivo per la rilevazione del peso dei RP comunicati a WasteStorage. <br>
 	La bilancia viene considerata come una fonte di informazioni autonoma. Non avendo però a disposizione una bilancia fisica, è necessario realizzarla.
 	Data la sua semplicità puo essere una semplice variabile all'interno di WasteStorage.
@@ -338,7 +338,7 @@ div.imagedesc{
 
 <h2>Testing</h2> 
 <div class="remark">
-	il test descritto di sopra si trova <a href="../../WasteIncineratorService_2.1_test/src/main/java/test/ws_test.java">qui</a>.
+	Il test descritto di sopra si trova <a href="../../WasteIncineratorService_2.1_test/src/main/java/test/ws_test.java">qui</a>.
 </div>
 
 <h2>Deployment</h2> 
@@ -346,8 +346,8 @@ div.imagedesc{
  
 <h2>Maintenance</h2> 
 <h2>Prossimi sviluppi</h2>
-<div>
-	Nel prossimo SPRINT si procederà ad analizzare e sviluppare Incinerator, in particolare la sua capacità di essere attivo, bruciare RP e comunicarlo ad altri.
+<div class="remark">
+	Nel prossimo SPRINT si procederà ad analizzare e sviluppare MonitoringDevice insieme a led e sonar. Lo scopo sarà di gestire il led in base allo stato del sistema e ricevere output del sonar.
 </div>
  <br><br>
 <!-- USEFUL
@@ -363,11 +363,11 @@ div.imagedesc{
 
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-    By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
+	By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
 	<img src="../../../img/marko.jpg" alt="mbot" width="15%" height="15%"><br>
 	And Arasi Stefano, mat: 0001103134, email: arasi.stefano@studio.unibo.it
 	<img src="../../../img/stefano.jpg" alt="mbot" width="15%" height="15%"><br>
-GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
+GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git" style="color: #90ee90;">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
 </div>
 </body>
 </html>

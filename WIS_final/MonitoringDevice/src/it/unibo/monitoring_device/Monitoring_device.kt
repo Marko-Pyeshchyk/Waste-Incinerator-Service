@@ -73,6 +73,8 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 						if( checkMsgContent( Term.createTerm("sonar_value(K)"), Term.createTerm("sonar_value(K)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 Distance = payloadArg(0).toInt()  
+								updateResourceRep( "sonar_value($Distance)"  
+								)
 								CommUtils.outred("$name			distance: $Distance")
 								forward("sonar_value", "sonar_value($Distance)" ,"wis" ) 
 								if(  max_dist<Distance  

@@ -240,9 +240,12 @@ div.imagedesc{
 <div class="body"> 
 <h2>Introduction</h2>
 <div class="remark">
-	SPRINT1: progettazione e sviluppo del incinerator (Arasi e P'yeshchyk).
+	SPRINT1: progettazione e sviluppo del incinerator (Arasi e P'yeshchyk). <br>
+	Il goal è sviluppare Incinerator in modo da renderlo operativo, quindi con la capacità di reagire al comando di attivazione, buciare RP ed emettere l'evento <code>burn_end</code> e non accettare più di un RP alla volta.
 	<br><br>
 	Il punto di partenza di questo SPRINT è lo <a href="../../WasteIncineratorService/userDocs/PyeshchykMarko_ArasiStefano_WIS24.html">SPRINT0</a>.
+	<br>
+	
 </div>
  
 <h2>Requirements</h2>
@@ -254,21 +257,6 @@ div.imagedesc{
 
 <h2>Requirement analysis</h2>
 <div class="remark">
-	<br><br><h3>Incinerator</h3>
-	Luogo fisico definito nella Service Area, conme descritto precedentemente.
-	<br><br>
-	Un activation_command viene mandato da parte di un agente esterno al sistema per far partire l'Incinerator. Questo non deve bruciare RP se non è stato attivato.
-	<br><br>
-	Dopo l'inizio dell'incenerimento passano BTIME secondi e <code>Event burn_end:burn_end(N)</code> viene comunicato dal Incinerator (fine dell'incenerimento). <br>
-	Per questi motivi l'Incinerator è un attore. <br><br>
-
-	 <br><br><h3>Modello dei requisiti</h3>
-	 <img src="../../wis24arch_modello_requisiti.png">
-</div>
-
-<h2>Problem analysis</h2>
-<div class="remark">
-	GOAL: Incinerator. <br><br>
 	<h3>Service Area</h3>
     Spazio rettangolare che puo essere descritto come <a href="./html/RobotCleaner.html?highlight=requisiti#rc24-analisi-dei-requisiti">spazio euclideo delimitato da bordi</a>. <br>
     La stanza viene rappresentata da una griglia di quadrati, dove ogni quadrato ha come lato il diametro della circonferenza che circoscrive il robot DR.<br>
@@ -285,20 +273,34 @@ div.imagedesc{
     <li>ASHOUT port: posizionata sul lato inferiore di Incinerator nelle celle map[2,4] e map[2,5]</li>
 
 	<h3>Incinerator</h3>
-	Per l'attivazione dell'Incinerator serve un segnale (wifi, blootooth) dall'esterno. 
-	Il segnale viene inviato da un attore esterno al sistema. <br>
-	Il messaggio verrà modellato come <code>Dispatch activation_command:activation_command(N)</code>
+	Luogo fisico definito nella Service Area, conme descritto precedentemente.
 	<br><br>
-	L'Incinerator deve ricevere un segnale quando il robot mette il RP nella porta BURNIN per iniziare a bruciare.
-	Il segnale puo essere inviato dal OpRobot o dal WIS (che funge da coordiantore del sistema). <br>
+	Un activation_command viene mandato da parte di un agente esterno al sistema per far partire l'Incinerator. Questo non deve bruciare RP se non è stato attivato.
+	<br><br>
+	Dopo l'inizio dell'incenerimento passano BTIME secondi e <code>Event burn_end:burn_end(N)</code> viene comunicato dal Incinerator (fine dell'incenerimento). <br>
+	Per questi motivi l'Incinerator è un attore. 
+
+	 <br><br><h3>Modello dei requisiti</h3>
+	 <img src="../../wis24arch_modello_requisiti.png">
+</div>
+
+<h2>Problem analysis</h2>
+<div class="remark">
+
+	<h3>Incinerator</h3>
+	Per l'attivazione dell'Incinerator serve un segnale (wifi, blootooth) inviato da un agente esterno al sistema. <br>
+	Essendo un semplice comando di attivazione e non è richiesta nessuna risposta da requisiti, Il messaggio verrà modellato come: <br><code>Dispatch activation_command:activation_command(N)</code>
+	<br><br>
+	Quando il OpRobot mette un RP nella porta BURNIN, è importante che Incinerator si accorga di cio per iniziare a bruciare.
+	Perciò l''Incinerator deve ricevere un segnale questo avviene.
+	Ci sono due candidati per mandare il segnale: OpRobot o WIS. <br>
 	Dare questa responsabilità al OpRobot genererebbe meno traffico ma andrebbe contro il SRP.
 	Quindi è meglio dare la responsabilità al WIS in quanto coordinatore del sistema.
-	<br>Il messaggio verrà modellato come <code>Dispatch burn_start:burn_start(N)</code>
+	<br>Il messaggio, analogamente a quello di attivazione, verrà modellato come: <br><code>Dispatch burn_start:burn_start(N)</code>
 	<br><br>
-	Bisogna far in modo che l'Incinerator accetti un nuovo RP se e solo se la cenere è stata tolta.
-	Sia OpRobot che WIS potrebbero comunicargli tale informazione.
-	Per lo stesso ragionamento fatto precedentemente la responsabilità viene data a WIS. 
-	<br>Il messaggio verrà modellato come <code>Dispatch ash_taken:ash_taken(N)</code> 
+	Infine, bisogna far in modo che l'Incinerator accetti un nuovo RP se e solo se la cenere è stata tolta e, come nel caso precedente, qualcuno glielo deve comunicare.
+	Sia OpRobot che WIS potrebbero farlo ma, per lo stesso ragionamento fatto precedentemente, la responsabilità viene data a WIS. 
+	<br>Il messaggio verrà modellato come: <br> <code>Dispatch ash_taken:ash_taken(N)</code> 
 	<br><br>
 	<h3>Architettura logica</h3>
 	<img src="../wis24arch_architettura_logica.png">
@@ -320,7 +322,7 @@ div.imagedesc{
 	<br>
 	Incinerator è un attore con una variabile BTIME per definire il tempo di bruciatura.
 	Aspetta il comando di attivazione per partire. 
-	Attraverso il PingPong tra i stati ready e burning gestisce il RP uno alla volta.
+	Attraverso il ping-pong tra i stati ready e burning gestisce gli RP uno alla volta.
 	<br><br>
 	Gli altri attori sono dei mock che servono per simulare le funzionalità delle componenti con cui Incinerator comunica.
 </div>
@@ -338,8 +340,8 @@ div.imagedesc{
  
 <h2>Maintenance</h2> 
 <h2>Prossimi sviluppi</h2>
-<div>
-	Nel prossimo SPRINT si procederà ad analizzare e sviluppare Incinerator, in particolare la sua capacità di essere attivo, bruciare RP e comunicarlo ad altri.
+<div class="remark">
+	Nel prossimo SPRINT si procederà ad analizzare e sviluppare WasteStorage, in particolare la possibilità di ricevere dall'esterno RP e comunicarne il numero a WIS sfruttando la bilancia.
 </div>
  <br><br>
 <!-- USEFUL
@@ -353,11 +355,11 @@ div.imagedesc{
 -->
 	      	
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-    By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
+	By Marko P'yeshchyk, mat: 0001103132, email: marko.pyeshchyk@studio.unibo.it
 	<img src="../../../img/marko.jpg" alt="mbot" width="15%" height="15%"><br>
 	And Arasi Stefano, mat: 0001103134, email: arasi.stefano@studio.unibo.it
 	<img src="../../../img/stefano.jpg" alt="mbot" width="15%" height="15%"><br>
-GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
+GIT repo: <a href="https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git" style="color: #90ee90;">https://github.com/Marko-Pyeshchyk/Waste-Incinerator-Service.git</a>
 </div>
 </body>
 </html>
