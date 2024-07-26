@@ -40,8 +40,8 @@ request( test_data, test_data(X) ).
 reply( test_data, test_data(X) ).  %%for test_data
 %====================================================================================
 context(ctxwis, "localhost",  "TCP", "8080").
-context(ctxbrobot, "127.0.0.1",  "TCP", "8020").
-context(ctxmd, "192.168.1.60",  "TCP", "8080").
+context(ctxbrobot, "192.168.1.50",  "TCP", "8020").
+context(ctxmd, "10.0.0.10",  "TCP", "8080").
  qactor( basicrobot, ctxbrobot, "external").
   qactor( monitoring_device, ctxmd, "external").
   qactor( op_robot, ctxwis, "it.unibo.op_robot.Op_robot").

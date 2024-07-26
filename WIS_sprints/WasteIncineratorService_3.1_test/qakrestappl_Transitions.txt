@@ -1,11 +1,3 @@
-{"actor":"waste_storage", "msgType":"dispatch", "curstate":"s0", "nextstate":"convert_kg", "msgId":"kg"}
-{"actor":"waste_storage", "msgType":"dispatch", "curstate":"convert_kg", "nextstate":"convert_kg", "msgId":"kg"}
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"activated", "msgId":"activation_command"}
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"ready", "nextstate":"burning", "msgId":"burn_start"}
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"burning", "nextstate":"ready", "msgId":"ash_taken"}
-{"actor":"wis_mock", "msgType":"dispatch", "curstate":"s0", "nextstate":"ready", "msgId":"activation_command"}
-{"actor":"wis_mock", "msgType":"dispatch", "curstate":"retrieve_ash", "nextstate":"update_rp", "msgId":"rp_number"}
-{"actor":"wis_mock", "msgType":"dispatch", "curstate":"update_rp", "nextstate":"update_rp", "msgId":"rp_number"}
 {"actor":"monitoring_device", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleSonar", "msgId":"sonar_value"}
 {"actor":"monitoring_device", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleStart", "msgId":"burn_start"}
 {"actor":"monitoring_device", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleEnd", "msgId":"burn_end"}
@@ -30,9 +22,3 @@
 {"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleOn", "msgId":"led_on"}
 {"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleOff", "msgId":"led_off"}
 {"actor":"led", "msgType":"dispatch", "curstate":"handleFlashing", "nextstate":"handleFlashing", "msgId":"led_flashing"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"ready", "nextstate":"update_led", "msgId":"state"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"ready", "nextstate":"update_sonar", "msgId":"level"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"ready", "nextstate":"update_burn", "msgId":"burn"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"handle_test", "nextstate":"update_led", "msgId":"state"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"handle_test", "nextstate":"update_sonar", "msgId":"level"}
-{"actor":"test_observer", "msgType":"dispatch", "curstate":"handle_test", "nextstate":"update_burn", "msgId":"burn"}

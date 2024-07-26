@@ -21,7 +21,7 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-			val DLIMIT = 15;
+			val DLIMIT = 10;
 				var max_dist = 0
 				var Distance = 999;
 				var burning = 0;

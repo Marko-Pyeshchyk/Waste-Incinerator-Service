@@ -21,9 +21,8 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-			val DLIMIT = 300;
-				var max_dist = 0
-				var Distance = 999;
+			val DLIMIT = 300L; 
+				var Distance = 9999L;
 				var burning = 0;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
@@ -34,18 +33,14 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="handleSonar",cond=whenDispatch("sonar_value"))
-					transition(edgeName="t010",targetState="handleStart",cond=whenDispatch("burn_start"))
-					transition(edgeName="t011",targetState="handleEnd",cond=whenDispatch("burn_end"))
+					 transition(edgeName="t00",targetState="handleSonar",cond=whenDispatch("sonar_value"))
+					transition(edgeName="t01",targetState="handleStart",cond=whenDispatch("burn_start"))
+					transition(edgeName="t02",targetState="handleEnd",cond=whenDispatch("burn_end"))
 				}	 
 				state("handleStart") { //this:State
 					action { //it:State
 						 burning = 1  
-						CommUtils.outmagenta("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-						updateResourceRep( "burn(1)"  
-						)
-						forward("burn", "burn(1)" ,"test_observer" ) 
-						if(  Distance>DLIMIT && Distance!=max_dist  
+						if(  Distance>DLIMIT  
 						 ){forward("led_on", "led_on(N)" ,"led" ) 
 						}
 						//genTimer( actor, state )
@@ -53,20 +48,14 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="handleSonar",cond=whenDispatch("sonar_value"))
-					transition(edgeName="t013",targetState="handleStart",cond=whenDispatch("burn_start"))
-					transition(edgeName="t014",targetState="handleEnd",cond=whenDispatch("burn_end"))
+					 transition(edgeName="t03",targetState="handleSonar",cond=whenDispatch("sonar_value"))
+					transition(edgeName="t04",targetState="handleStart",cond=whenDispatch("burn_start"))
+					transition(edgeName="t05",targetState="handleEnd",cond=whenDispatch("burn_end"))
 				}	 
 				state("handleEnd") { //this:State
 					action { //it:State
 						 burning = 0  
-						CommUtils.outmagenta("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-						CommUtils.outgray("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						updateResourceRep( "burn(0)"  
-						)
-						forward("burn", "burn(0)" ,"test_observer" ) 
-						if(  Distance>DLIMIT && Distance!=max_dist  
+						if(  Distance>DLIMIT  
 						 ){forward("led_off", "led_off(N)" ,"led" ) 
 						}
 						//genTimer( actor, state )
@@ -74,37 +63,24 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="handleSonar",cond=whenDispatch("sonar_value"))
-					transition(edgeName="t016",targetState="handleStart",cond=whenDispatch("burn_start"))
-					transition(edgeName="t017",targetState="handleEnd",cond=whenDispatch("burn_end"))
+					 transition(edgeName="t06",targetState="handleSonar",cond=whenDispatch("sonar_value"))
+					transition(edgeName="t07",targetState="handleStart",cond=whenDispatch("burn_start"))
+					transition(edgeName="t08",targetState="handleEnd",cond=whenDispatch("burn_end"))
 				}	 
 				state("handleSonar") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("sonar_value(K)"), Term.createTerm("sonar_value(K)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 Distance = payloadArg(0).toInt()  
+								 Distance = payloadArg(0).toLong()  
 								CommUtils.outred("DISTANCE: $Distance")
-								updateResourceRep( "level($Distance)"  
-								)
-								forward("sonar_value", "sonar_value($Distance)" ,"wis_mock" ) 
-								if(  max_dist<Distance  
-								 ){ max_dist=Distance  
-								}
+								forward("sonar_value", "sonar_value($Distance)" ,"wis" ) 
 								if(  Distance<=DLIMIT  
 								 ){forward("led_flashing", "led_flashing(N)" ,"led" ) 
 								}
 								else
-								 {if(  max_dist==Distance  
-								  ){forward("led_flashing", "led_flashing(N)" ,"led" ) 
+								 {if(  burning==1  
+								  ){forward("led_on", "led_on(N)" ,"led" ) 
 								 }
-								 else
-								  {if(  burning==1  
-								   ){forward("led_on", "led_on(N)" ,"led" ) 
-								  }
-								  else
-								   {forward("led_off", "led_off(N)" ,"led" ) 
-								   }
-								  }
 								 }
 						}
 						//genTimer( actor, state )
@@ -112,9 +88,9 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="handleSonar",cond=whenDispatch("sonar_value"))
-					transition(edgeName="t019",targetState="handleStart",cond=whenDispatch("burn_start"))
-					transition(edgeName="t020",targetState="handleEnd",cond=whenDispatch("burn_end"))
+					 transition(edgeName="t09",targetState="handleSonar",cond=whenDispatch("sonar_value"))
+					transition(edgeName="t010",targetState="handleStart",cond=whenDispatch("burn_start"))
+					transition(edgeName="t011",targetState="handleEnd",cond=whenDispatch("burn_end"))
 				}	 
 			}
 		}

@@ -22,11 +22,12 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var Level=9999
+				var Last=9999
 				var New=9999
 				var Times=0
 				var FLAG=-1
 				var Number=0
+				var neg=0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -62,20 +63,26 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 						if( checkMsgContent( Term.createTerm("sonar_value(K)"), Term.createTerm("sonar_value(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var New=payloadArg(0).toInt()  
-								CommUtils.outmagenta("NEW:	$New	LEVEL:	$Level")
-								if(  Level-New<5 && Level-New>-5  
+								CommUtils.outmagenta("NEW:	$New	LEVEL:	$Last")
+								if(  Last-New<5 && Last-New>-5  
 								 ){ 
-													Level=New 
+													Last=New 
 													Times++
-								if(  Times==5  
+								if(  Times==7 && neg==0  
 								 ){ 
 														FLAG++ 
 								}
 								}
 								else
-								 { 
+								 {if(  New>Last  
+								  ){ neg=1  
+								 }
+								 else
+								  { neg=0  
+								  }
+								  
 								 					Times=0 
-								 					Level=New
+								 					Last=New
 								 }
 								CommUtils.outcyan("Flag: $FLAG		Times: $Times	NUMBER:	$Number")
 								if(  FLAG==Number  

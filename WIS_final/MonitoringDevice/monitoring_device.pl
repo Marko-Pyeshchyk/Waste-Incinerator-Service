@@ -10,7 +10,7 @@ dispatch( led_flashing, led_flashing(N) ).
 event( sonardata, sonardata(K) ).
 %====================================================================================
 context(ctxmd, "localhost",  "TCP", "8080").
-context(ctxwis, "192.168.1.50",  "TCP", "8080").
+context(ctxwis, "10.0.0.2",  "TCP", "8080").
  qactor( wis, ctxwis, "external").
   qactor( monitoring_device, ctxmd, "it.unibo.monitoring_device.Monitoring_device").
  static(monitoring_device).

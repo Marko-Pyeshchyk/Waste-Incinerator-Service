@@ -30,54 +30,45 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="handleOn",cond=whenDispatch("led_on"))
-					transition(edgeName="t022",targetState="handleOff",cond=whenDispatch("led_off"))
-					transition(edgeName="t023",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
+					 transition(edgeName="t012",targetState="handleOn",cond=whenDispatch("led_on"))
+					transition(edgeName="t013",targetState="handleOff",cond=whenDispatch("led_off"))
+					transition(edgeName="t014",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
 				}	 
 				state("handleOn") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED ON")
-						updateResourceRep( "state(on)"  
-						)
-						forward("state", "state(on)" ,"test_observer" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="handleOn",cond=whenDispatch("led_on"))
-					transition(edgeName="t025",targetState="handleOff",cond=whenDispatch("led_off"))
-					transition(edgeName="t026",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
+					 transition(edgeName="t015",targetState="handleOn",cond=whenDispatch("led_on"))
+					transition(edgeName="t016",targetState="handleOff",cond=whenDispatch("led_off"))
+					transition(edgeName="t017",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
 				}	 
 				state("handleOff") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED OFF")
-						updateResourceRep( "state(off)"  
-						)
-						forward("state", "state(off)" ,"test_observer" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="handleOn",cond=whenDispatch("led_on"))
-					transition(edgeName="t028",targetState="handleOff",cond=whenDispatch("led_off"))
-					transition(edgeName="t029",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
+					 transition(edgeName="t018",targetState="handleOn",cond=whenDispatch("led_on"))
+					transition(edgeName="t019",targetState="handleOff",cond=whenDispatch("led_off"))
+					transition(edgeName="t020",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
 				}	 
 				state("handleFlashing") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED FLASHING")
-						updateResourceRep( "state(flashing)"  
-						)
-						forward("state", "state(flashing)" ,"test_observer" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t030",targetState="handleOn",cond=whenDispatch("led_on"))
-					transition(edgeName="t031",targetState="handleOff",cond=whenDispatch("led_off"))
-					transition(edgeName="t032",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
+					 transition(edgeName="t021",targetState="handleOn",cond=whenDispatch("led_on"))
+					transition(edgeName="t022",targetState="handleOff",cond=whenDispatch("led_off"))
+					transition(edgeName="t023",targetState="handleFlashing",cond=whenDispatch("led_flashing"))
 				}	 
 			}
 		}

@@ -31,9 +31,6 @@ class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						delay(3000) 
 						 K= 1  
 						emitLocalStreamEvent("sonardata", "sonardata($K)" ) 
-						delay(3000) 
-						 K= 500  
-						emitLocalStreamEvent("sonardata", "sonardata($K)" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

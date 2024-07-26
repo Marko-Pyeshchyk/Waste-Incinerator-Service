@@ -57,8 +57,8 @@ Reply test_data:test_data(X) for test_data
 
 // context
 Context ctxwis  ip [host="localhost" port=8080] 
-Context ctxbrobot ip [host="127.0.0.1" port=8020] 
-Context ctxmd ip [host="192.168.1.60" port=8080] 
+Context ctxbrobot ip [host="192.168.1.50" port=8020] 
+Context ctxmd ip [host="10.0.0.10" port=8080]
 
 ExternalQActor basicrobot context ctxbrobot 
 ExternalQActor monitoring_device context ctxmd 
@@ -294,7 +294,7 @@ QActor wis context ctxwis {
 		var incinerator="off"
 		var robot_sent=0
 		var ash_available=0
-		var DLIMIT=15
+		var DLIMIT=10
 		var RP_remove = -50
 	#]
 	State s0 initial {
@@ -429,11 +429,12 @@ QActor activator_mock context ctxwis {
 
 QActor test_observer context ctxwis{
 	[# 
-		var Level=9999
+		var Last=9999
 		var New=9999
 		var Times=0
 		var FLAG=-1
 		var Number=0
+		var neg=0
 	#]
 	State s0 initial{
 		delay 500
@@ -458,22 +459,27 @@ QActor test_observer context ctxwis{
 		printCurrentMessage color cyan
 		onMsg(sonar_value:sonar_value(X)) {
 			[# var New=payloadArg(0).toInt() #]
-			println("NEW:	$New	LEVEL:	$Level") color magenta
-			if [# Level-New<5 && Level-New>-5 #]
+			println("NEW:	$New	LEVEL:	$Last") color magenta
+			if [# Last-New<5 && Last-New>-5 #]
 			{
 				[# 
-					Level=New 
+					Last=New 
 					Times++
 				#]
-				if [# Times==5 #]{
+				if [# Times==7 && neg==0 #]{
 					[# 
 						FLAG++ 
 					#]
 				}
 			} else {
+				if [# New>Last #]{
+					[# neg=1 #]
+				} else{
+					[# neg=0 #]
+				}
 				[# 
 					Times=0 
-					Level=New
+					Last=New
 				#]
 			}
 			println("Flag: $FLAG		Times: $Times	NUMBER:	$Number") color cyan

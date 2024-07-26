@@ -32,7 +32,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t033",targetState="handleSonar",cond=whenEvent("sonardata"))
+					 transition(edgeName="t024",targetState="handleSonar",cond=whenEvent("sonardata"))
 				}	 
 				state("handleSonar") { //this:State
 					action { //it:State
@@ -46,7 +46,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t034",targetState="handleSonar",cond=whenEvent("sonardata"))
+					 transition(edgeName="t025",targetState="handleSonar",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

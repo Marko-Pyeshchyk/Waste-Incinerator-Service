@@ -28,7 +28,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				var incinerator="off"
 				var robot_sent=0
 				var ash_available=0
-				var DLIMIT=15
+				var DLIMIT=10
 				var RP_remove = -50
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State

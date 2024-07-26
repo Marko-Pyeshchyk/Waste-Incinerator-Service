@@ -14,12 +14,12 @@ Dispatch led_flashing:led_flashing(N)
 Event sonardata:sonardata(K)
 
 Context ctxmd ip [host="localhost" port=8080] 
-Context ctxwis ip [host="192.168.1.50" port=8080]
+Context ctxwis ip [host="10.0.0.2" port=8080]
 
 ExternalQActor wis context ctxwis 
 
 QActor monitoring_device context ctxmd{
-	[#	val DLIMIT = 15;
+	[#	val DLIMIT = 10;
 		var max_dist = 0
 		var Distance = 999;
 		var burning = 0;
