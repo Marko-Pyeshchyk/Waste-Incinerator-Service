@@ -90,8 +90,8 @@ public class WIS_functional_test2 {
 	@Before
 	public void activate() {
 		CommUtils.outmagenta("TestWISCtx activate ");
-		activateSystemUsingGradle();
-		//activateSystemUsingDeploy();
+		//activateSystemUsingGradle();
+		activateSystemUsingDeploy();
 	}
 	/*
 	 * After each test	

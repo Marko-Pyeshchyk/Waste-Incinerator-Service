@@ -121,7 +121,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("activated") { //this:State
 					action { //it:State
-						updateResourceRep( "data($name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available)"  
+						updateResourceRep( "$name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available"  
 						)
 						if(  rp_number>0 && distance>DLIMIT && incinerator!="burning" && (robot=="waiting_home" || robot=="job_done") && robot_sent==0 && ash_available==0  
 						 ){forward("take_RP", "take_RP(X)" ,"op_robot" ) 

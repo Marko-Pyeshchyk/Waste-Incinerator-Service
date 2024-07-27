@@ -30,7 +30,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 						CommUtils.outcyan("$name	START")
 						delay(500) 
 						subscribeToLocalActor("incinerator") 
-						request("engage", "engage($MyName,135)" ,"basicrobot" )  
+						request("engage", "engage($MyName,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
