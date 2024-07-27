@@ -57,8 +57,8 @@ Reply test_data:test_data(X) for test_data
 
 // context
 Context ctxwis  ip [host="localhost" port=8080] 
-Context ctxbrobot ip [host="192.168.1.50" port=8020] 
-Context ctxmd ip [host="10.0.0.10" port=8080]
+Context ctxbrobot ip [host="192.168.1.59" port=8020] 
+Context ctxmd ip [host="10.0.0.10" port=8091]
 
 ExternalQActor basicrobot context ctxbrobot 
 ExternalQActor monitoring_device context ctxmd 
@@ -73,7 +73,7 @@ QActor op_robot  context ctxwis {
 		println("$name	START") color cyan
 		delay 500
 		subscribeTo incinerator for burn_end
-		request basicrobot -m engage : engage($MyName,135)
+		request basicrobot -m engage : engage($MyName,330)
 	}
 	Transition t0 whenReply engagedone -> ready
 				  whenReply engagerefused -> end
@@ -346,7 +346,7 @@ QActor wis context ctxwis {
 	Goto activated
 	
 	State activated {
-		updateResource[# "data($name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available)" #]
+		updateResource[# "$name	INFO:	numero RP: $rp_number	distance: $distance	incinerator: $incinerator	robot: $robot	ash: $ash_available" #]
 		//println("$name		ACTIVE") color green
 		//println("$name	INFO:	rp_number: $rp_number	distance: $distance	incinerator: $incinerator		robot: $robot	ash: $ash_available") color green
 		if [# rp_number>0 && distance>DLIMIT && incinerator!="burning" && (robot=="waiting_home" || robot=="job_done") && robot_sent==0 && ash_available==0 #] {
@@ -425,8 +425,8 @@ QActor activator_mock context ctxwis {
 		forward waste_storage -m kg:kg(102)
 		forward waste_storage -m kg:kg(51)
 	}
-}*/
-
+}
+*/
 QActor test_observer context ctxwis{
 	[# 
 		var Last=9999

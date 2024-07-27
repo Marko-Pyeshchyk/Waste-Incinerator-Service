@@ -41,7 +41,7 @@ reply( test_data, test_data(X) ).  %%for test_data
 %====================================================================================
 context(ctxwis, "localhost",  "TCP", "8080").
 context(ctxbrobot, "192.168.1.50",  "TCP", "8020").
-context(ctxmd, "10.0.0.10",  "TCP", "8080").
+context(ctxmd, "192.168.1.60",  "TCP", "8091").
  qactor( basicrobot, ctxbrobot, "external").
   qactor( monitoring_device, ctxmd, "external").
   qactor( op_robot, ctxwis, "it.unibo.op_robot.Op_robot").
@@ -54,5 +54,7 @@ context(ctxmd, "10.0.0.10",  "TCP", "8080").
  static(wis).
   qactor( activator_mock, ctxwis, "it.unibo.activator_mock.Activator_mock").
  static(activator_mock).
+  qactor( external_agent_ws, ctxwis, "it.unibo.external_agent_ws.External_agent_ws").
+ static(external_agent_ws).
   qactor( test_observer, ctxwis, "it.unibo.test_observer.Test_observer").
  static(test_observer).

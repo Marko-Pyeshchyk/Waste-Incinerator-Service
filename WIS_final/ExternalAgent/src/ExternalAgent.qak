@@ -1,0 +1,24 @@
+System ea
+
+Dispatch kg:kg(X)
+
+Context ctxea ip [ host="localhost" port=8088 ]
+Context ctxwis ip [ host="192.168.1.56" port=8080 ]
+
+ExternalQActor waste_storage context ctxwis
+
+QActor external_agent context ctxea{
+	State s0 initial{
+		delay 2000
+		println("ATTIVAZIONE EXTERNAL AGENT!!!!!!!!!") color red
+	}
+	Goto work
+	
+	State work{
+		forward waste_storage -m kg:kg(247)
+		delay 5000
+		forward waste_storage -m kg:kg(105)
+		delay 10000
+		[# System.exit(0) #]
+	}
+}

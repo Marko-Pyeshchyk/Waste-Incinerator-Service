@@ -73,8 +73,6 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 						if( checkMsgContent( Term.createTerm("sonar_value(K)"), Term.createTerm("sonar_value(K)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 Distance = payloadArg(0).toInt()  
-								updateResourceRep( "sonar_value($Distance)"  
-								)
 								CommUtils.outred("$name			distance: $Distance")
 								forward("sonar_value", "sonar_value($Distance)" ,"wis" ) 
 								if(  max_dist<Distance  
@@ -84,12 +82,12 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 								 ){forward("led_flashing", "led_flashing(N)" ,"led" ) 
 								}
 								else
-								 {if(  max_dist==Distance  
-								  ){forward("led_flashing", "led_flashing(N)" ,"led" ) 
+								 {if(  burning==1  
+								  ){forward("led_on", "led_on(N)" ,"led" ) 
 								 }
 								 else
-								  {if(  burning==1  
-								   ){forward("led_on", "led_on(N)" ,"led" ) 
+								  {if(  Distance>=max_dist-5  
+								   ){forward("led_flashing", "led_flashing(N)" ,"led" ) 
 								  }
 								  else
 								   {forward("led_off", "led_off(N)" ,"led" ) 

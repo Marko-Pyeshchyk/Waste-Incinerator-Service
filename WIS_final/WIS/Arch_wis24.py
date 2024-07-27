@@ -31,6 +31,7 @@ with Diagram('wis24Arch', show=False, outformat='png', graph_attr=graphattr) as 
           incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
           wis=Custom('wis','./qakicons/symActorSmall.png')
           activator_mock=Custom('activator_mock','./qakicons/symActorSmall.png')
+          external_agent_ws=Custom('external_agent_ws','./qakicons/symActorSmall.png')
           test_observer=Custom('test_observer','./qakicons/symActorSmall.png')
      with Cluster('ctxbrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
@@ -44,6 +45,7 @@ with Diagram('wis24Arch', show=False, outformat='png', graph_attr=graphattr) as 
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<burn_start &nbsp; ash_taken &nbsp; >',  fontcolor='blue') >> incinerator
      op_robot >> Edge(color='blue', style='solid',  decorate='true', label='<cmd<font color="darkgreen"> cmddone cmdfailed</font> &nbsp; >',  fontcolor='blue') >> basicrobot
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<take_RP &nbsp; take_ash &nbsp; go_home &nbsp; map &nbsp; >',  fontcolor='blue') >> op_robot
+     external_agent_ws >> Edge(color='blue', style='solid',  decorate='true', label='<kg &nbsp; >',  fontcolor='blue') >> waste_storage
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<sonar_value &nbsp; >',  fontcolor='blue') >> test_observer
      waste_storage >> Edge(color='blue', style='solid',  decorate='true', label='<rp_number &nbsp; >',  fontcolor='blue') >> wis
      activator_mock >> Edge(color='blue', style='solid',  decorate='true', label='<activation_command &nbsp; >',  fontcolor='blue') >> incinerator

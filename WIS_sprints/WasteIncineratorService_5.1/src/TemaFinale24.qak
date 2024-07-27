@@ -437,12 +437,12 @@ QActor monitoring_device context ctxwis{
 			if [# Distance<=DLIMIT #] {
 				forward led -m led_flashing:led_flashing(N)
 			} else {
-				if [# max_dist==Distance #] {
-					forward led -m led_flashing:led_flashing(N)
-				} else {
-					if [# burning==1 #] {
+				if [# burning==1 #] {
 						forward led -m led_on:led_on(N)                             
-					} else {
+				} else {
+					if [# Distance>=max_dist-5 #] {
+						forward led -m led_flashing:led_flashing(N)
+					}  else {
 						forward led -m led_off:led_off(N)
 					}
 				}

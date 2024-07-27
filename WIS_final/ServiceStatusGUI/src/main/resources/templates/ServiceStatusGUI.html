@@ -5,44 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Display</title>
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
         table {
-            width: 50%;
+            width: 80%; /* Larghezza fissa metà pagina */
             margin: 50px auto;
             border-collapse: collapse;
         }
         th, td {
             border: 1px solid #dddddd;
-            text-align: left;
+            text-align: center;
             padding: 8px;
+            width: 50%; /* Le celle occupano metà della larghezza della tabella */
+            height: 50px;
+            background-color: #ccffcc;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin: 2px;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #99ff99;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        iframe {
-    display: block;
-    width: 100%;
-    max-width: 600px; /* Imposta una larghezza massima per schermi più grandi */
-    margin: 20px auto;
-    border: none;
-    height: auto;
-    aspect-ratio: 16 / 9; /* Mantiene un rapporto d'aspetto di 16:9 */
-}
-
+        #map {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        #chart-container {
+            width: 100%;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-	<button onclick="connect()">Connect</button>
+    <button onclick="connect()">Connect</button>
     <table id="data-table">
         <tr>
-            <th>Name</th>
-            <th>Value</th>
+            <th>Info</th>
+            <th>Valore</th>
         </tr>
     </table>
     <pre>MAPPA DELLA STANZA<br><span id="map"></span></pre>
+    <div id="chart-container">
+        <canvas id="distance-chart"></canvas>
+    </div>
     <script src="script.js"></script>
 	<script>connect()</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+        // Dati di esempio per il grafico
+        const distanceData = [];
+
+        // Configurazione del grafico
+        const ctx = document.getElementById('distance-chart').getContext('2d');
+        const distanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Distance',
+                    data: distanceData,
+                    borderColor: 'green',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 80,
+                        reverse: true, // Invertire l'asse Y
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Funzione per aggiornare il grafico con nuovi dati
+        function updateChart(distance) {
+            const now = new Date();
+            distanceChart.data.datasets[0].data.push({ x: now, y: distance });
+            distanceChart.update();
+        }
+
+        // Aggiorna il grafico con i dati della tabella
+        function updateFromTable() {
+            const rows = document.querySelectorAll('#data-table tr');
+            rows.forEach(row => {
+                const nameCell = row.cells[0];
+                if (nameCell && nameCell.textContent === 'distance') {
+                    const distanceValue = row.cells[1].textContent;
+                    updateChart(Number(distanceValue));
+                }
+            });
+        }
+
+        // Esempio di aggiornamento del grafico
+        setInterval(updateFromTable, 1000); // Aggiorna ogni 5 secondi
+    </script>
 </body>
 </html>

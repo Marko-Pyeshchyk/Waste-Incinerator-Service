@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Display</title>
+    <style>
+        table {
+            width: 50%;
+            margin: 50px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        iframe {
+    display: block;
+    width: 100%;
+    max-width: 600px; /* Imposta una larghezza massima per schermi più grandi */
+    margin: 20px auto;
+    border: none;
+    height: auto;
+    aspect-ratio: 16 / 9; /* Mantiene un rapporto d'aspetto di 16:9 */
+}
+
+    </style>
+</head>
+<body>
+	<button onclick="connect()">Connect</button>
+    <table id="data-table">
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+    </table>
+    <pre>MAPPA DELLA STANZA<br><span id="map"></span></pre>
+    <script src="script.js"></script>
+	<script>connect()</script>
+</body>
+</html>

@@ -5,7 +5,10 @@ function connect() {
     var host = document.location.host;
     var pathname = "/"                   //document.location.pathname;
     var addr = "ws://" + host + pathname + "ServiceStatusGUI";
-
+	
+	if(socket!=null){
+		socket.close();
+	}
     socket = new WebSocket(addr);
     
 

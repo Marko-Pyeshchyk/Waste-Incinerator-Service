@@ -13,8 +13,9 @@ Dispatch led_flashing:led_flashing(N)
 
 Event sonardata:sonardata(K)
 
-Context ctxmd ip [host="localhost" port=8080] 
+Context ctxmd ip [host="localhost" port=8091] 
 Context ctxwis ip [host="10.0.0.2" port=8080]
+//Context ctxwis ip [host="192.168.1.56" port=8080]
 
 ExternalQActor wis context ctxwis 
 
@@ -54,7 +55,6 @@ QActor monitoring_device context ctxmd{
 	State handleSonar{
 		onMsg(sonar_value:sonar_value(K)){
 			[# Distance = payloadArg(0).toInt() #]
-			updateResource[# "sonar_value($Distance)" #]
 			println("$name			distance: $Distance") color red
 			forward wis -m sonar_value:sonar_value($Distance)
 			if [# max_dist<Distance #] {
@@ -63,12 +63,12 @@ QActor monitoring_device context ctxmd{
 			if [# Distance<=DLIMIT #] {
 				forward led -m led_flashing:led_flashing(N)
 			} else {
-				if [# max_dist==Distance #] {
-					forward led -m led_flashing:led_flashing(N)
-				} else {
-					if [# burning==1 #] {
+				if [# burning==1 #] {
 						forward led -m led_on:led_on(N)                             
-					} else {
+				} else {
+					if [# Distance>=max_dist-5 #] {
+						forward led -m led_flashing:led_flashing(N)
+					}  else {
 						forward led -m led_off:led_off(N)
 					}
 				}
